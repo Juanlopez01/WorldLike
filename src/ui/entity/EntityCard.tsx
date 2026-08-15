@@ -109,16 +109,16 @@ export function EntityCard({ entity, selected, compact, onClick }: EntityCardPro
       }} />
 
       {/* Top section: OVR + position + country */}
-      <div className="relative z-10 flex justify-between items-start p-3 pb-0">
+      <div className="relative z-10 flex justify-between items-start p-2 sm:p-3 pb-0">
         <div className="text-center">
-          <div className="text-3xl font-black text-white leading-none drop-shadow-sm">{overall}</div>
-          <div className="text-[8px] font-bold text-white/70 uppercase tracking-widest">OVR</div>
-          <div className="text-[9px] font-bold text-white/80 uppercase mt-1">{entity.category.slice(0, 3)}</div>
-          <div className="text-[9px] text-white/60 mt-0.5">Nv.{level}</div>
+          <div className="text-2xl sm:text-3xl font-black text-white leading-none drop-shadow-sm">{overall}</div>
+          <div className="text-[7px] sm:text-[8px] font-bold text-white/70 uppercase tracking-widest">OVR</div>
+          <div className="text-[8px] sm:text-[9px] font-bold text-white/80 uppercase mt-1">{entity.category.slice(0, 3)}</div>
+          <div className="text-[8px] sm:text-[9px] text-white/60 mt-0.5">Nv.{level}</div>
         </div>
         <div className="flex flex-col items-end gap-0.5">
           {entity.types.slice(0, 2).map((t) => (
-            <span key={t} className="text-[7px] font-bold uppercase tracking-wider text-white/60 bg-white/10 px-1.5 py-0.5 rounded">
+            <span key={t} className="text-[6px] sm:text-[7px] font-bold uppercase tracking-wider text-white/60 bg-white/10 px-1 sm:px-1.5 py-0.5 rounded">
               {t}
             </span>
           ))}
@@ -128,7 +128,7 @@ export function EntityCard({ entity, selected, compact, onClick }: EntityCardPro
       {/* Player image */}
       <div className="relative z-10 flex justify-center -mt-1">
         {entity.imageUrl ? (
-          <div className="w-28 h-28 relative">
+          <div className="w-3/5 aspect-square max-w-28 relative">
             <img
               src={entity.imageUrl}
               alt={entity.name}
@@ -137,19 +137,19 @@ export function EntityCard({ entity, selected, compact, onClick }: EntityCardPro
             />
           </div>
         ) : (
-          <div className="w-28 h-28 flex items-center justify-center text-5xl opacity-50">
+          <div className="w-3/5 aspect-square max-w-28 flex items-center justify-center text-4xl sm:text-5xl opacity-50">
             ⚽
           </div>
         )}
       </div>
 
       {/* Bottom card: name + stats */}
-      <div className="relative z-10 mx-2 -mt-2 mb-2 rounded-xl bg-black/20 backdrop-blur-sm p-2.5 border border-white/10">
+      <div className="relative z-10 mx-1.5 sm:mx-2 -mt-2 mb-1.5 sm:mb-2 rounded-xl bg-black/20 backdrop-blur-sm p-1.5 sm:p-2.5 border border-white/10">
         {/* Name bar */}
-        <div className="text-center mb-2 pb-1.5 border-b border-white/15">
-          <h3 className="text-xs font-black text-white truncate">{entity.name}</h3>
+        <div className="text-center mb-1.5 sm:mb-2 pb-1 sm:pb-1.5 border-b border-white/15">
+          <h3 className="text-[10px] sm:text-xs font-black text-white truncate">{entity.name}</h3>
           {entity.team && (
-            <p className="text-[8px] text-white/50 truncate">{entity.team} {entity.country ? `· ${entity.country}` : ""}</p>
+            <p className="text-[7px] sm:text-[8px] text-white/50 truncate">{entity.team} {entity.country ? `· ${entity.country}` : ""}</p>
           )}
         </div>
 
@@ -158,8 +158,8 @@ export function EntityCard({ entity, selected, compact, onClick }: EntityCardPro
           <div className="flex-1 space-y-0.5">
             {leftStats.map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-[9px] font-black text-white/90 tabular-nums w-5 text-right">{value}</span>
-                <span className="text-[7px] font-bold text-white/50 uppercase tracking-wider">{STAT_LABELS[key] ?? key.slice(0, 3).toUpperCase()}</span>
+                <span className="text-[8px] sm:text-[9px] font-black text-white/90 tabular-nums w-4 sm:w-5 text-right">{value}</span>
+                <span className="text-[6px] sm:text-[7px] font-bold text-white/50 uppercase tracking-wider">{STAT_LABELS[key] ?? key.slice(0, 3).toUpperCase()}</span>
               </div>
             ))}
           </div>
@@ -167,8 +167,8 @@ export function EntityCard({ entity, selected, compact, onClick }: EntityCardPro
           <div className="flex-1 space-y-0.5">
             {rightStats.map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-[9px] font-black text-white/90 tabular-nums w-5 text-right">{value}</span>
-                <span className="text-[7px] font-bold text-white/50 uppercase tracking-wider">{STAT_LABELS[key] ?? key.slice(0, 3).toUpperCase()}</span>
+                <span className="text-[8px] sm:text-[9px] font-black text-white/90 tabular-nums w-4 sm:w-5 text-right">{value}</span>
+                <span className="text-[6px] sm:text-[7px] font-bold text-white/50 uppercase tracking-wider">{STAT_LABELS[key] ?? key.slice(0, 3).toUpperCase()}</span>
               </div>
             ))}
           </div>

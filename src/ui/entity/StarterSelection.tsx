@@ -44,21 +44,17 @@ export function StarterSelection({ theme, onSelect }: StarterSelectionProps) {
   }, [theme, purchasedPlayers]);
 
   return (
-    <motion.div
-      className="h-screen flex flex-col items-center justify-center p-4 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
+    <div className="h-screen flex flex-col items-center justify-center overflow-y-auto p-3 sm:p-4">
       <motion.div
-        className="text-center mb-4"
+        className="text-center mb-3 sm:mb-4"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <h1 className="text-xl font-black text-text mb-1">
+        <h1 className="text-lg sm:text-xl font-black text-text mb-1">
           {theme.uiTheme.labels.recruitVerb}
         </h1>
-        <p className="text-xs text-text-secondary">
+        <p className="text-[10px] sm:text-xs text-text-secondary">
           Elegí tu {theme.uiTheme.labels.entitySingular} inicial
         </p>
         <div className="mt-2 h-0.5 w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent" />
@@ -74,14 +70,14 @@ export function StarterSelection({ theme, onSelect }: StarterSelectionProps) {
           <h3 className="text-[10px] font-bold text-accent uppercase tracking-wider mb-2 text-center">
             Leyendas compradas
           </h3>
-          <div className="flex justify-center gap-3">
+          <div className="flex justify-center gap-2 sm:gap-3 px-1">
             {specialStarters.map(({ entity }, i) => (
               <motion.div
                 key={entity.id}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 + i * 0.1 }}
-                className="w-[160px]"
+                className="flex-1 min-w-0 max-w-[180px]"
               >
                 <div className={`rounded-xl border-2 transition-all ${selectedId === entity.id ? "border-accent glow-yellow" : "border-accent/30"}`}>
                   <EntityCard
@@ -97,12 +93,12 @@ export function StarterSelection({ theme, onSelect }: StarterSelectionProps) {
         </motion.div>
       )}
 
-      <div className="flex justify-center gap-3 w-full max-w-2xl">
+      <div className="flex justify-center gap-2 sm:gap-3 w-full max-w-2xl px-1">
         <AnimatePresence>
           {starters.map((entity, i) => (
             <motion.div
               key={entity.id}
-              className="w-[160px]"
+              className="flex-1 min-w-0 max-w-[180px]"
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: (specialStarters.length > 0 ? 0.5 : 0.3) + i * 0.15 }}
@@ -124,7 +120,7 @@ export function StarterSelection({ theme, onSelect }: StarterSelectionProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             onClick={() => onSelect(selectedId)}
-            className="mt-4 px-8 py-3 rounded-lg font-bold text-sm
+            className="mt-3 sm:mt-4 px-8 py-3 rounded-lg font-bold text-sm
               bg-primary text-white
               hover:brightness-110 active:scale-95
               transition-all glow-green"
@@ -133,6 +129,6 @@ export function StarterSelection({ theme, onSelect }: StarterSelectionProps) {
           </motion.button>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
