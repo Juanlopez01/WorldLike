@@ -841,6 +841,23 @@ const PLAYER_IMAGES: Record<string, string> = {
   "p_co_bernardeschi": "https://r2.thesportsdb.com/images/media/player/cutout/fwmcl01758896784.png",
   "p_co_f_jara": "https://r2.thesportsdb.com/images/media/player/cutout/tp8waw1762860967.png",
   "p_co_d_rossi": "https://r2.thesportsdb.com/images/media/player/cutout/vqfzmb1766428306.png",
+  // Round 2 — fetched missing images
+  "p_uc_b_henrique": "https://r2.thesportsdb.com/images/media/player/cutout/a0znu71750455127.png",
+  "p_uc_dudu": "https://r2.thesportsdb.com/images/media/player/cutout/11l0pt1763755196.png",
+  "p_uc_rony": "https://r2.thesportsdb.com/images/media/player/cutout/g83qt91674745645.png",
+  "p_uc_l_diaz_e": "https://r2.thesportsdb.com/images/media/player/cutout/989ou31763042018.png",
+  "p_uc_gabigol": "https://r2.thesportsdb.com/images/media/player/cutout/yfna9l1767455650.png",
+  "p_uc_wanchope": "https://r2.thesportsdb.com/images/media/player/cutout/mkwkzm1773755702.png",
+  // Legends
+  "sp_maradona": "https://r2.thesportsdb.com/images/media/player/cutout/v298851606327825.png",
+  "sp_pele": "https://r2.thesportsdb.com/images/media/player/cutout/s4apzi1615723073.png",
+  "sp_zidane": "https://r2.thesportsdb.com/images/media/player/cutout/ae7bng1586814446.png",
+  "sp_ronaldinho": "https://r2.thesportsdb.com/images/media/player/cutout/u91au61586868506.png",
+  "sp_cruyff": "https://r2.thesportsdb.com/images/media/player/cutout/ze75mx1594069754.png",
+  "sp_di_stefano": "https://r2.thesportsdb.com/images/media/player/thumb/hetubh1528736225.jpg",
+  "sp_van_basten": "https://r2.thesportsdb.com/images/media/player/cutout/y4mua11615720110.png",
+  "sp_beckenbauer": "https://r2.thesportsdb.com/images/media/player/cutout/nkcqxh1704739821.png",
+  "sp_maldini": "https://r2.thesportsdb.com/images/media/player/cutout/9ccmbp1665653152.png",
 };
 
 function parseTeamCountry(desc: string): { team?: string; country?: string } {

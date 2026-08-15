@@ -76,8 +76,8 @@ export function GameScreen() {
   );
 
   const handleRecruit = useCallback(
-    (template: EntityTemplate) => {
-      useGameStore.getState().recruitEntity(template);
+    (template: EntityTemplate, swapIndex?: number) => {
+      useGameStore.getState().recruitEntity(template, swapIndex);
     },
     []
   );
@@ -125,6 +125,8 @@ export function GameScreen() {
         offers={recruitmentOffers}
         cost={{ monedas: 100 }}
         playerResources={resources}
+        party={party}
+        maxPartySize={theme?.combatConfig?.maxPartySize ?? 2}
         onRecruit={handleRecruit}
         onSkip={handleSkipRecruitment}
       />

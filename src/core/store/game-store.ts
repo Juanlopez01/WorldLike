@@ -37,7 +37,7 @@ export interface GameState {
   triggerEvent: () => void;
   onEventChoice: (outcome: Outcome, choice: Choice) => void;
   triggerRecruitment: () => void;
-  recruitEntity: (template: EntityTemplate) => void;
+  recruitEntity: (template: EntityTemplate, swapIndex?: number) => void;
   skipRecruitment: () => void;
   swapPartyMembers: (fromIdx: number, toIdx: number) => void;
   addToParty: (entity: EntityInstance) => void;
@@ -374,15 +374,16 @@ export const useGameStore = create<GameState>((set, get) => ({
             : `Mapa ${nextMap}`;
 
           const revealedMap = revealConnectedNodes(newMapObj, newMapObj.startNodeId);
+          const healedParty = updatedParty.map((p) => ({ ...p, currentHp: p.maxHp }));
           set({
             currentMap: nextMap,
             map: revealedMap,
             currentNodeId: newMapObj.startNodeId,
             visitedNodes: [],
             status: "map",
-            party: updatedParty,
+            party: healedParty,
           });
-          get().updateResources({ ...resourceChanges, energia: 30 - Math.max(0, (resources.energia ?? 0)), moral: 10 });
+          get().updateResources({ ...resourceChanges, energia: 100 - Math.max(0, (resources.energia ?? 0)), moral: 10 });
           return;
         }
       }
@@ -406,12 +407,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   triggerRecruitment: () => {
     const { theme, party, seed, currentCopa } = get();
     if (!theme) return;
-
-    const maxParty = theme.combatConfig?.maxPartySize ?? 2;
-    if (party.length >= maxParty) {
-      set({ status: "map" });
-      return;
-    }
 
     const partyIds = new Set(party.map((e) => e.templateId));
     const available = theme.entities.filter(
@@ -457,20 +452,30 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ recruitmentOffers: offers, status: "recruitment" });
   },
 
-  recruitEntity: (template) => {
-    const { seed } = get();
+  recruitEntity: (template, swapIndex) => {
+    const { seed, party, theme } = get();
     const rng = new SeededRNG(seed + Date.now());
     const instance = instantiateEntity(template, rng);
+    const maxParty = theme?.combatConfig?.maxPartySize ?? 2;
 
-    set((state) => ({
-      party: [...state.party, instance],
-      recruitmentOffers: [],
-      status: "map",
-      resources: {
-        ...state.resources,
-        moral: Math.min(100, (state.resources.moral ?? 100) + 5),
-      },
-    }));
+    set((state) => {
+      let newParty: EntityInstance[];
+      if (swapIndex !== undefined && state.party.length >= maxParty) {
+        newParty = [...state.party];
+        newParty[swapIndex] = instance;
+      } else {
+        newParty = [...state.party, instance];
+      }
+      return {
+        party: newParty,
+        recruitmentOffers: [],
+        status: "map",
+        resources: {
+          ...state.resources,
+          moral: Math.min(100, (state.resources.moral ?? 100) + 5),
+        },
+      };
+    });
     get().updateResources({ monedas: -100 });
   },
 
