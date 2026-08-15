@@ -478,14 +478,14 @@ function checkPostEnemyTurn(state: CombatState): CombatState {
   return { ...state, status: "player_turn", turn: state.turn + 1 };
 }
 
-function updateCombatant(state: CombatState, updated: Combatant): CombatState {
+function updateCombatant(state: CombatState, updated: Combatant | EntityInstance): CombatState {
   return {
     ...state,
     playerTeam: state.playerTeam.map((c) =>
-      c.instanceId === updated.instanceId ? updated : c
+      c.instanceId === updated.instanceId ? { ...c, ...updated } as Combatant : c
     ),
     enemyTeam: state.enemyTeam.map((c) =>
-      c.instanceId === updated.instanceId ? updated : c
+      c.instanceId === updated.instanceId ? { ...c, ...updated } as Combatant : c
     ),
   };
 }

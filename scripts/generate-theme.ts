@@ -272,7 +272,7 @@ const RARE_PLAYERS: PlayerDef[] = RARE_NAMES.map(([id, name, desc, cat, prof, ty
   types: [...types] as string[],
   tags: [...tags] as string[],
   level: 4 + Math.floor(i / 8),
-  statProfile: prof as string,
+  statProfile: prof as PlayerDef["statProfile"],
   skillIds: getSkillsForProfile(prof as string, "rare", i + 100),
   flavor: `${name} trae clase al equipo.`,
 }));
@@ -384,7 +384,7 @@ const UNCOMMON_PLAYERS: PlayerDef[] = UNCOMMON_NAMES.map(([id, name, desc, cat, 
   types: getTypesForProfile(prof as string),
   tags: ["liga_local"],
   level: 2 + Math.floor(i / 10),
-  statProfile: prof as string,
+  statProfile: prof as PlayerDef["statProfile"],
   skillIds: getSkillsForProfile(prof as string, "uncommon", i + 200),
   flavor: `${name} sueña con la titularidad.`,
 }));
@@ -496,7 +496,7 @@ const COMMON_PLAYERS: PlayerDef[] = COMMON_NAMES.map(([id, name, desc, cat, prof
   types: getTypesForProfile(prof as string),
   tags: ["potrero"],
   level: 1 + Math.floor(i / 12),
-  statProfile: prof as string,
+  statProfile: prof as PlayerDef["statProfile"],
   skillIds: getSkillsForProfile(prof as string, "common", i + 300),
   flavor: `${name} viene del barrio con hambre de gloria.`,
 }));
@@ -1312,7 +1312,7 @@ function buildTheme() {
     ],
 
     combatConfig: {
-      maxPartySize: 4,
+      maxPartySize: 2,
       maxActivePerSide: 1,
       baseCritChance: 0.08,
       critMultiplier: 1.5,

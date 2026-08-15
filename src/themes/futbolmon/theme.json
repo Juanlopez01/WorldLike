@@ -28222,7 +28222,7 @@
     }
   ],
   "combatConfig": {
-    "maxPartySize": 4,
+    "maxPartySize": 2,
     "maxActivePerSide": 1,
     "baseCritChance": 0.08,
     "critMultiplier": 1.5,

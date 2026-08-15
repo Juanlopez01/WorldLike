@@ -11,15 +11,15 @@ export interface SpecialPlayer {
 
 export const SPECIAL_PLAYERS: SpecialPlayer[] = [
   { id: "sp_maradona", name: "Diego Maradona", cost: 10000, emoji: "🇦🇷" },
-  { id: "sp_pele", name: "Pelé", cost: 10000, emoji: "🇧🇷" },
-  { id: "sp_zidane", name: "Zinedine Zidane", cost: 7500, emoji: "🇫🇷" },
-  { id: "sp_ronaldo_n", name: "Ronaldo Nazário", cost: 7500, emoji: "🇧🇷" },
-  { id: "sp_ronaldinho", name: "Ronaldinho", cost: 5000, emoji: "🇧🇷" },
-  { id: "sp_cruyff", name: "Johan Cruyff", cost: 5000, emoji: "🇳🇱" },
-  { id: "sp_di_stefano", name: "Alfredo Di Stéfano", cost: 5000, emoji: "🇦🇷" },
-  { id: "sp_van_basten", name: "Marco van Basten", cost: 3000, emoji: "🇳🇱" },
-  { id: "sp_beckenbauer", name: "Franz Beckenbauer", cost: 3000, emoji: "🇩🇪" },
-  { id: "sp_maldini", name: "Paolo Maldini", cost: 2000, emoji: "🇮🇹" },
+  { id: "sp_pele", name: "Pelé", cost: 7500, emoji: "🇧🇷" },
+  { id: "sp_zidane", name: "Zinedine Zidane", cost: 5000, emoji: "🇫🇷" },
+  { id: "sp_ronaldo_n", name: "Ronaldo Nazário", cost: 5000, emoji: "🇧🇷" },
+  { id: "sp_cruyff", name: "Johan Cruyff", cost: 3500, emoji: "🇳🇱" },
+  { id: "sp_ronaldinho", name: "Ronaldinho", cost: 3000, emoji: "🇧🇷" },
+  { id: "sp_di_stefano", name: "Alfredo Di Stéfano", cost: 2500, emoji: "🇦🇷" },
+  { id: "sp_van_basten", name: "Marco van Basten", cost: 1500, emoji: "🇳🇱" },
+  { id: "sp_beckenbauer", name: "Franz Beckenbauer", cost: 1000, emoji: "🇩🇪" },
+  { id: "sp_maldini", name: "Paolo Maldini", cost: 500, emoji: "🇮🇹" },
 ];
 
 export const COPA_REWARDS: Record<string, number> = {

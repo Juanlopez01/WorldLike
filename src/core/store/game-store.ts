@@ -407,6 +407,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     const { theme, party, seed, currentCopa } = get();
     if (!theme) return;
 
+    const maxParty = theme.combatConfig?.maxPartySize ?? 2;
+    if (party.length >= maxParty) {
+      set({ status: "map" });
+      return;
+    }
+
     const partyIds = new Set(party.map((e) => e.templateId));
     const available = theme.entities.filter(
       (e) => !partyIds.has(e.id) && !e.id.startsWith("e_")
