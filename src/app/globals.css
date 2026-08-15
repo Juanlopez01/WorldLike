@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f0f4f0;
+  --color-bg-alt: #e8ede8;
+  --color-surface: #ffffff;
+  --color-surface-light: #f7faf7;
+  --color-surface-glow: #eaf2ea;
+  --color-border: #d0ddd0;
+  --color-border-light: #c0d0c0;
+
+  --color-text: #1a2e1a;
+  --color-text-secondary: #4a6a4a;
+  --color-text-dim: #8a9e8a;
+
+  --color-primary: #1b8a3a;
+  --color-primary-dim: rgba(27, 138, 58, 0.1);
+  --color-primary-glow: rgba(27, 138, 58, 0.2);
+
+  --color-accent: #d4a017;
+  --color-accent-dim: rgba(212, 160, 23, 0.1);
+  --color-accent-glow: rgba(212, 160, 23, 0.25);
+
+  --color-danger: #c0392b;
+  --color-danger-dim: rgba(192, 57, 43, 0.1);
+
+  --color-epic: #7e57c2;
+  --color-epic-dim: rgba(126, 87, 194, 0.1);
+
+  --color-legendary: #d4a017;
+  --color-legendary-dim: rgba(212, 160, 23, 0.1);
+
+  --color-info: #2980b9;
+  --color-info-dim: rgba(41, 128, 185, 0.1);
+
+  --color-common: #7f8c8d;
+  --color-uncommon: #27ae60;
+  --color-rare: #2980b9;
+
+  --color-field-light: #4caf50;
+  --color-field-dark: #388e3c;
+  --color-field-line: rgba(255, 255, 255, 0.6);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+/* Glow utilities */
+.glow-green {
+  box-shadow: 0 2px 12px var(--color-primary-glow), 0 0 30px rgba(27, 138, 58, 0.08);
+}
+.glow-yellow {
+  box-shadow: 0 2px 12px var(--color-accent-glow), 0 0 30px rgba(212, 160, 23, 0.08);
+}
+
+/* Card shadow */
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Node pulse animation */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Football field backgrounds — solid colors */
+.field-potrero {
+  background: #a89040;
+}
+
+.field-barrial {
+  background: #4a8e2e;
+}
+
+.field-profesional {
+  background: #2d7b1f;
+}
+
+.field-continental {
+  background: #1b5e20;
+}
+
+.field-mundial {
+  background: #0d4a14;
+}
+
+/* Rarity border gradients */
+.rarity-common { border-color: var(--color-common); }
+.rarity-uncommon { border-color: var(--color-uncommon); }
+.rarity-rare { border-color: var(--color-rare); }
+.rarity-epic { border-color: var(--color-epic); }
+.rarity-legendary {
+  border-image: linear-gradient(135deg, #d4a017, #e8b828, #d4a017) 1;
+}

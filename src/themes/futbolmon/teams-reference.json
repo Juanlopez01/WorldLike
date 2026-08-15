@@ -1,0 +1,79 @@
+{
+  "_source": "TheSportsDB Free API (https://www.thesportsdb.com)",
+  "_note": "Datos de referencia para escudos, estadios y IDs. Usar para UI del mapa y contexto narrativo.",
+  "leagues": [
+    {
+      "id": "4406",
+      "name": "Liga Profesional Argentina",
+      "badge": "https://r2.thesportsdb.com/images/media/league/badge/rk9xhx1768238251.png",
+      "logo": "https://r2.thesportsdb.com/images/media/league/logo/v4zcaz1589960217.png",
+      "country": "Argentina"
+    },
+    {
+      "id": "4328",
+      "name": "English Premier League",
+      "badge": "https://r2.thesportsdb.com/images/media/league/badge/gasy9d1737743125.png",
+      "logo": "https://r2.thesportsdb.com/images/media/league/logo/4c377s1535214890.png",
+      "country": "England"
+    },
+    {
+      "id": "4335",
+      "name": "Spanish La Liga",
+      "badge": "https://r2.thesportsdb.com/images/media/league/badge/ja4it51687628717.png",
+      "logo": "https://r2.thesportsdb.com/images/media/league/logo/gq4b1r1687707889.png",
+      "country": "Spain"
+    }
+  ],
+  "teams": {
+    "argentina": [
+      { "id": "135156", "name": "Boca Juniors", "badge": "https://r2.thesportsdb.com/images/media/team/badge/bm7krb1775741582.png", "stadium": "Estadio Alberto José Armando" },
+      { "id": "135171", "name": "River Plate", "badge": "https://r2.thesportsdb.com/images/media/team/badge/03dmi31645539717.png", "stadium": "Estadio Más Monumental" },
+      { "id": "135170", "name": "Racing Club", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vi4mu41695734959.png", "stadium": "Estadio Presidente Perón" },
+      { "id": "135164", "name": "Independiente", "badge": "https://r2.thesportsdb.com/images/media/team/badge/eki4nd1580842605.png", "stadium": "Estadio Libertadores de América" },
+      { "id": "139152", "name": "San Lorenzo", "badge": "https://r2.thesportsdb.com/images/media/team/badge/jih7hv1582229717.png", "stadium": "Polideportivo Roberto Pando" },
+      { "id": "135163", "name": "Huracán", "badge": "https://r2.thesportsdb.com/images/media/team/badge/kppi2b1775776550.png", "stadium": "Estadio Tomás Adolfo Ducó" },
+      { "id": "135179", "name": "Vélez Sarsfield", "badge": "https://r2.thesportsdb.com/images/media/team/badge/jo98m71517769587.png", "stadium": "Estadio José Amalfitani" },
+      { "id": "135160", "name": "Estudiantes de La Plata", "badge": "https://r2.thesportsdb.com/images/media/team/badge/pf08dq1760634366.png", "stadium": "Estadio Jorge Luis Hirschi" },
+      { "id": "135166", "name": "Newell's Old Boys", "badge": "https://r2.thesportsdb.com/images/media/team/badge/23aftf1580842633.png", "stadium": "Estadio Marcelo Bielsa" },
+      { "id": "135172", "name": "Rosario Central", "badge": "https://r2.thesportsdb.com/images/media/team/badge/y6q1ds1769660256.png", "stadium": "Estadio Gigante de Arroyito" },
+      { "id": "136674", "name": "Talleres de Córdoba", "badge": "https://r2.thesportsdb.com/images/media/team/badge/7hum2t1769310938.png", "stadium": "Estadio Mario Alberto Kempes" },
+      { "id": "135162", "name": "Godoy Cruz", "badge": "https://r2.thesportsdb.com/images/media/team/badge/d3c0ds1517768584.png", "stadium": "Estadio Malvinas Argentinas" },
+      { "id": "135165", "name": "Lanús", "badge": "https://r2.thesportsdb.com/images/media/team/badge/ddty0w1769146364.png", "stadium": "Estadio Ciudad de Lanús" },
+      { "id": "135177", "name": "Tigre", "badge": "https://r2.thesportsdb.com/images/media/team/badge/krryg71765858882.png", "stadium": "Estadio José Dellagiovanna" },
+      { "id": "137775", "name": "Platense", "badge": "https://r2.thesportsdb.com/images/media/team/badge/lbs14n1769317149.png", "stadium": "Estadio Ciudad de Vicente López" },
+      { "id": "135175", "name": "Sarmiento", "badge": "https://r2.thesportsdb.com/images/media/team/badge/xxofu71677634191.png", "stadium": "Estadio Eva Perón de Junín" },
+      { "id": "137786", "name": "Instituto", "badge": "https://r2.thesportsdb.com/images/media/team/badge/jup59w1578825794.png", "stadium": "Estadio Juan Domingo Perón" },
+      { "id": "135178", "name": "Unión", "badge": "https://r2.thesportsdb.com/images/media/team/badge/btnx6q1734587495.png", "stadium": "Estadio 15 de Abril" },
+      { "id": "135157", "name": "Colón", "badge": "https://r2.thesportsdb.com/images/media/team/badge/l72gz21712750680.png", "stadium": "Estadio Brigadier General Estanislao López" },
+      { "id": "135151", "name": "Argentinos Juniors", "badge": "https://r2.thesportsdb.com/images/media/team/badge/uqfjuo1769234850.png", "stadium": "Estadio Diego Armando Maradona" },
+      { "id": "135155", "name": "Belgrano", "badge": "https://r2.thesportsdb.com/images/media/team/badge/0twgzi1517768087.png", "stadium": "Estadio Julio César Villagra" },
+      { "id": "135154", "name": "Banfield", "badge": "https://r2.thesportsdb.com/images/media/team/badge/c2ea011775756104.png", "stadium": "Estadio Florencio Solá" },
+      { "id": "135159", "name": "Defensa y Justicia", "badge": "https://r2.thesportsdb.com/images/media/team/badge/3guvlh1775778978.png", "stadium": "Estadio Norberto Tito Tomaghello" },
+      { "id": "135681", "name": "Atlético Tucumán", "badge": "https://r2.thesportsdb.com/images/media/team/badge/m5i2q21775755577.png", "stadium": "Estadio Monumental Presidente José Fierro" }
+    ],
+    "england": [
+      { "id": "133604", "name": "Arsenal", "badge": "https://r2.thesportsdb.com/images/media/team/badge/uyhbfe1612467038.png", "stadium": "Emirates Stadium" },
+      { "id": "133613", "name": "Manchester City", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vwpvry1467462651.png", "stadium": "Etihad Stadium" },
+      { "id": "133612", "name": "Manchester United", "badge": "https://r2.thesportsdb.com/images/media/team/badge/xzqdr11517660252.png", "stadium": "Old Trafford" },
+      { "id": "133602", "name": "Liverpool", "badge": "https://r2.thesportsdb.com/images/media/team/badge/kfaher1737969724.png", "stadium": "Anfield" },
+      { "id": "133610", "name": "Chelsea", "badge": "https://www.thesportsdb.com/images/media/team/badge/pbf4ul1782638263.png", "stadium": "Stamford Bridge" },
+      { "id": "133616", "name": "Tottenham Hotspur", "badge": "https://r2.thesportsdb.com/images/media/team/badge/dfyfhl1604094109.png", "stadium": "Tottenham Hotspur Stadium" },
+      { "id": "134777", "name": "Newcastle United", "badge": "https://r2.thesportsdb.com/images/media/team/badge/lhwuiz1621593302.png", "stadium": "St James Park" },
+      { "id": "133601", "name": "Aston Villa", "badge": "https://www.thesportsdb.com/images/media/team/badge/cgvxt61785930389.png", "stadium": "Villa Park" },
+      { "id": "133619", "name": "Brighton and Hove Albion", "badge": "https://r2.thesportsdb.com/images/media/team/badge/ywypts1448810904.png", "stadium": "American Express Stadium" },
+      { "id": "133636", "name": "West Ham United", "badge": "https://r2.thesportsdb.com/images/media/team/badge/yutyxs1467459956.png", "stadium": "London Stadium" }
+    ],
+    "spain": [
+      { "id": "133739", "name": "Barcelona", "badge": "https://r2.thesportsdb.com/images/media/team/badge/wq9sir1639406443.png", "stadium": "Spotify Camp Nou" },
+      { "id": "133738", "name": "Real Madrid", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vwvwrw1473502969.png", "stadium": "Estadio Santiago Bernabéu" },
+      { "id": "133729", "name": "Atlético Madrid", "badge": "https://r2.thesportsdb.com/images/media/team/badge/0ulh3q1719984315.png", "stadium": "Riyadh Air Metropolitano" },
+      { "id": "133724", "name": "Real Sociedad", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vptvpr1473502986.png", "stadium": "Reale Arena" },
+      { "id": "133722", "name": "Real Betis", "badge": "https://r2.thesportsdb.com/images/media/team/badge/2oqulv1663245386.png", "stadium": "Estadio de La Cartuja" },
+      { "id": "133740", "name": "Villarreal", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vrypqy1473503073.png", "stadium": "Estadio de la Cerámica" },
+      { "id": "133727", "name": "Athletic Bilbao", "badge": "https://r2.thesportsdb.com/images/media/team/badge/68w7fe1639408210.png", "stadium": "San Mamés Barria" },
+      { "id": "133735", "name": "Sevilla", "badge": "https://r2.thesportsdb.com/images/media/team/badge/vpsqqx1473502977.png", "stadium": "Estadio Ramón Sánchez Pizjuán" },
+      { "id": "133725", "name": "Valencia", "badge": "https://r2.thesportsdb.com/images/media/team/badge/dm8l6o1655594864.png", "stadium": "Estadio de Mestalla" },
+      { "id": "134700", "name": "Girona", "badge": "https://r2.thesportsdb.com/images/media/team/badge/kfu7zu1659897499.png", "stadium": "Estadi Municipal de Montilivi" }
+    ]
+  }
+}

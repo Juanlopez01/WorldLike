@@ -1,0 +1,484 @@
+{
+  "id": "game_of_thrones",
+  "version": "0.1.0",
+  "name": "La Senda del Trono",
+  "tagline": "Conquistá los Siete Reinos o morite en el intento",
+  "description": "Gestión de dinastía, intriga política, matrimonios de conveniencia y batallas épicas en un mundo de fantasía medieval.",
+  "icon": "⚔️",
+
+  "statDefinitions": [
+    { "id": "combat", "name": "Combate", "icon": "⚔️", "color": "#dc2626", "min": 0, "max": 100 },
+    { "id": "diplomacy", "name": "Diplomacia", "icon": "🤝", "color": "#2563eb", "min": 0, "max": 100 },
+    { "id": "intrigue", "name": "Intriga", "icon": "🗡️", "color": "#7c3aed", "min": 0, "max": 100 },
+    { "id": "power", "name": "Poder", "icon": "🔥", "color": "#ea580c", "min": 0, "max": 100 },
+    { "id": "defense", "name": "Defensa", "icon": "🛡️", "color": "#0891b2", "min": 0, "max": 100 },
+    { "id": "speed", "name": "Velocidad", "icon": "💨", "color": "#16a34a", "min": 0, "max": 100 },
+    { "id": "loyalty", "name": "Lealtad", "icon": "👑", "color": "#ca8a04", "min": 0, "max": 100 }
+  ],
+
+  "resourceDefinitions": [
+    { "id": "gold", "name": "Dragones de Oro", "icon": "🪙", "current": 100, "max": 9999 },
+    { "id": "influence", "name": "Influencia", "icon": "👑", "current": 50, "max": 999 },
+    { "id": "morale", "name": "Moral del Ejército", "icon": "🏴", "current": 100, "max": 100 },
+    { "id": "provisions", "name": "Provisiones", "icon": "🍖", "current": 80, "max": 200 }
+  ],
+
+  "entityCategories": [
+    { "id": "dragon", "name": "Dragón", "namePlural": "Dragones", "icon": "🐉", "description": "Criaturas legendarias de fuego y sangre", "maxInParty": 2 },
+    { "id": "champion", "name": "Campeón", "namePlural": "Campeones", "icon": "⚔️", "description": "Guerreros de élite y caballeros juramentados", "maxInParty": 3 },
+    { "id": "advisor", "name": "Consejero", "namePlural": "Consejeros", "icon": "📜", "description": "Maestres, espías y estrategas", "maxInParty": 2 }
+  ],
+
+  "entities": [
+    {
+      "id": "drag_01",
+      "name": "Drogon",
+      "description": "El más grande y feroz de los dragones de Daenerys, bautizado en honor a Khal Drogo.",
+      "category": "dragon",
+      "rarity": "legendary",
+      "imageUrl": "https://static.wikia.nocookie.net/gameofthrones/images/2/27/Drogon_infobox.jpg",
+      "stats": { "power": 95, "defense": 80, "speed": 85, "loyalty": 70 },
+      "baseStats": { "power": 95, "defense": 80, "speed": 85, "loyalty": 70 },
+      "growthRates": { "power": 3, "defense": 2, "speed": 2, "loyalty": 1 },
+      "types": ["fire", "flying"],
+      "tags": ["targaryen", "mount"],
+      "skills": [
+        { "id": "sk_dracarys", "name": "Dracarys", "description": "Aliento de fuego devastador que calcina todo a su paso.", "power": 45, "cost": 3, "costResource": "energy", "accuracy": 90, "targetType": "single_enemy", "damageType": "fire", "effects": [{ "id": "eff_burn", "name": "Quemadura", "type": "dot", "value": 8, "duration": 3 }], "cooldown": 2, "unlockLevel": 1, "tags": ["fire", "breath"] },
+        { "id": "sk_tailswipe", "name": "Coletazo", "description": "Un golpe brutal con la cola que puede aturdir.", "power": 25, "cost": 1, "costResource": "energy", "accuracy": 95, "targetType": "single_enemy", "damageType": "physical", "effects": [{ "id": "eff_stun", "name": "Aturdimiento", "type": "stun", "value": 0, "duration": 1 }], "cooldown": 0, "unlockLevel": 1, "tags": ["physical"] }
+      ],
+      "learnableSkills": [
+        { "skillId": "sk_inferno", "level": 15 },
+        { "skillId": "sk_dragon_fear", "level": 10 }
+      ],
+      "evolutions": [],
+      "passiveAbility": "Sangre del Dragón: Inmune a efectos de fuego",
+      "flavorText": "El fuego no puede matar a un dragón.",
+      "initialLevel": 1
+    },
+    {
+      "id": "champ_01",
+      "name": "Jaime Lannister",
+      "description": "El Matarreyes, uno de los mejores espadachines que vieron los Siete Reinos.",
+      "category": "champion",
+      "rarity": "epic",
+      "imageUrl": "https://static.wikia.nocookie.net/gameofthrones/images/e/eb/Jaime_Lannister_Season_8.png",
+      "stats": { "combat": 92, "diplomacy": 40, "intrigue": 30, "speed": 75, "defense": 70, "loyalty": 55 },
+      "baseStats": { "combat": 92, "diplomacy": 40, "intrigue": 30, "speed": 75, "defense": 70, "loyalty": 55 },
+      "growthRates": { "combat": 3, "diplomacy": 1, "intrigue": 1, "speed": 2, "defense": 2, "loyalty": 1 },
+      "types": ["martial"],
+      "tags": ["lannister", "kingsguard", "knight"],
+      "skills": [
+        { "id": "sk_golden_thrust", "name": "Estocada Dorada", "description": "Una estocada precisa con la espada de acero valyrio.", "power": 30, "cost": 2, "costResource": "energy", "accuracy": 95, "targetType": "single_enemy", "damageType": "physical", "effects": [], "cooldown": 0, "unlockLevel": 1, "tags": ["physical", "sword"] },
+        { "id": "sk_lions_roar", "name": "Rugido del León", "description": "Un grito de batalla que intimida al enemigo.", "power": 0, "cost": 2, "costResource": "energy", "accuracy": 100, "targetType": "all_enemies", "effects": [{ "id": "eff_intimidate", "name": "Intimidación", "type": "debuff", "stat": "combat", "value": -15, "duration": 2 }], "cooldown": 3, "unlockLevel": 5, "tags": ["support", "lannister"] }
+      ],
+      "learnableSkills": [
+        { "skillId": "sk_oath_breaker", "level": 12 }
+      ],
+      "evolutions": [
+        {
+          "targetId": "champ_01_redeemed",
+          "conditions": [
+            { "type": "stat_gte", "target": "loyalty", "value": 80 },
+            { "type": "flag", "target": "lost_hand", "value": true }
+          ],
+          "cost": { "gold": 200 },
+          "description": "La redención del Matarreyes"
+        }
+      ],
+      "passiveAbility": "Orgullo Lannister: +10% daño cuando el oro es > 500",
+      "flavorText": "Las cosas que hacemos por amor.",
+      "initialLevel": 5
+    },
+    {
+      "id": "adv_01",
+      "name": "Tyrion Lannister",
+      "description": "El Gnomo, Mano de la Reina. Lo que le falta en tamaño le sobra en astucia.",
+      "category": "advisor",
+      "rarity": "legendary",
+      "imageUrl": "https://static.wikia.nocookie.net/gameofthrones/images/8/86/Tyrion_Lannister_Season_8.png",
+      "stats": { "combat": 15, "diplomacy": 95, "intrigue": 90, "speed": 30, "loyalty": 65 },
+      "baseStats": { "combat": 15, "diplomacy": 95, "intrigue": 90, "speed": 30, "loyalty": 65 },
+      "growthRates": { "diplomacy": 3, "intrigue": 3, "loyalty": 1 },
+      "types": ["cunning"],
+      "tags": ["lannister", "hand_of_queen", "dwarf"],
+      "skills": [
+        { "id": "sk_wit", "name": "Ingenio Mordaz", "description": "Usa la dialéctica para desmoralizar al rival.", "power": 20, "cost": 1, "costResource": "energy", "accuracy": 100, "targetType": "single_enemy", "damageType": "political", "effects": [{ "id": "eff_demoralize", "name": "Desmoralización", "type": "debuff", "stat": "combat", "value": -10, "duration": 2 }], "cooldown": 1, "unlockLevel": 1, "tags": ["political"] },
+        { "id": "sk_bribe", "name": "Soborno", "description": "Un Lannister siempre paga sus deudas... y las ajenas.", "power": 0, "cost": 0, "costResource": "energy", "accuracy": 85, "targetType": "single_enemy", "effects": [{ "id": "eff_bribe", "name": "Sobornado", "type": "stun", "value": 0, "duration": 1 }], "cooldown": 4, "unlockLevel": 1, "tags": ["political", "gold"] }
+      ],
+      "learnableSkills": [],
+      "evolutions": [],
+      "passiveAbility": "Bebo y sé cosas: +15% XP para todo el grupo",
+      "flavorText": "Yo bebo y sé cosas.",
+      "initialLevel": 3
+    }
+  ],
+
+  "encounters": [
+    {
+      "id": "enc_kingsroad_bandits",
+      "name": "Bandidos del Camino Real",
+      "description": "Un grupo de forajidos bloquea el paso en el Camino Real.",
+      "difficulty": 2,
+      "enemies": [
+        { "templateId": "enemy_bandit", "levelRange": [1, 3], "count": 3 }
+      ],
+      "environment": "road",
+      "isBoss": false,
+      "rewards": { "xpMultiplier": 1, "guaranteedDrops": [], "bonusResourceChance": { "gold": 0.6 }, "recruitChance": 0 }
+    },
+    {
+      "id": "enc_mountain_clan",
+      "name": "Clan de las Montañas de la Luna",
+      "description": "Guerreros salvajes de las montañas del Valle de Arryn.",
+      "difficulty": 4,
+      "enemies": [
+        { "templateId": "enemy_clansman", "levelRange": [3, 6], "count": 2 },
+        { "templateId": "enemy_clan_chief", "levelRange": [5, 8], "count": 1 }
+      ],
+      "environment": "mountain",
+      "isBoss": false,
+      "rewards": { "xpMultiplier": 1.3, "guaranteedDrops": ["item_mountain_herbs"], "bonusResourceChance": { "provisions": 0.4 }, "recruitChance": 0.15 }
+    },
+    {
+      "id": "enc_boss_cersei",
+      "name": "El Juicio de Cersei",
+      "description": "La Reina Regente te acusa de traición ante la corte.",
+      "difficulty": 8,
+      "enemies": [
+        { "templateId": "boss_cersei", "levelRange": [12, 15], "count": 1 },
+        { "templateId": "enemy_kingsguard", "levelRange": [10, 12], "count": 2 }
+      ],
+      "environment": "throne_room",
+      "isBoss": true,
+      "music": "trial_by_combat",
+      "rewards": { "xpMultiplier": 2.5, "guaranteedDrops": ["item_valyrian_steel", "item_crown_jewel"], "bonusResourceChance": { "influence": 1.0 }, "recruitChance": 0 }
+    }
+  ],
+
+  "events": [
+    {
+      "id": "evt_red_wedding_rumor",
+      "title": "Rumores de una Boda",
+      "description": "Un cuervo mensajero llega con noticias de una boda en Los Gemelos. Los rumores hablan de traición.",
+      "category": "story",
+      "priority": 5,
+      "unique": true,
+      "act": 2,
+      "tags": ["frey", "stark", "betrayal"],
+      "choices": [
+        {
+          "id": "ch_investigate",
+          "text": "Enviar un espía a investigar",
+          "icon": "🕵️",
+          "costs": { "gold": 30 },
+          "checkStat": "intrigue",
+          "checkThreshold": 50,
+          "successChance": 0.7,
+          "successOutcome": {
+            "description": "Tu espía descubre los planes de traición de Walder Frey. Ganás ventaja estratégica.",
+            "resourceChanges": { "influence": 20 },
+            "setFlag": { "key": "knows_red_wedding", "value": true },
+            "xpGain": 50
+          },
+          "failureOutcome": {
+            "description": "Tu espía es descubierto y ejecutado. Los Frey ahora desconfían de vos.",
+            "resourceChanges": { "influence": -10, "gold": -20 }
+          },
+          "tags": ["intrigue"]
+        },
+        {
+          "id": "ch_attend",
+          "text": "Asistir a la boda",
+          "icon": "🏰",
+          "conditions": [{ "type": "resource_gte", "target": "morale", "value": 50 }],
+          "successOutcome": {
+            "description": "Asistís a la boda. Todo parece normal... por ahora.",
+            "triggerEvent": "evt_red_wedding_inside"
+          },
+          "tags": ["risky"]
+        },
+        {
+          "id": "ch_ignore",
+          "text": "Ignorar la invitación",
+          "icon": "🚫",
+          "successOutcome": {
+            "description": "Decidís no involucrarte. A veces la mejor jugada es no jugar.",
+            "resourceChanges": { "morale": 5 }
+          },
+          "tags": ["safe"]
+        }
+      ]
+    },
+    {
+      "id": "evt_blacksmith",
+      "title": "Herrero Ambulante",
+      "description": "Un herrero viajero ofrece sus servicios junto al camino. Tiene acero valyrio, pero su precio es alto.",
+      "category": "random",
+      "tags": ["shop", "equipment"],
+      "choices": [
+        {
+          "id": "ch_buy_sword",
+          "text": "Comprar espada de acero valyrio",
+          "icon": "🗡️",
+          "costs": { "gold": 150 },
+          "successOutcome": {
+            "description": "Adquirís una espada de acero valyrio. Tu campeón activo gana +15 combate.",
+            "statChanges": { "targetEntity": "active", "changes": { "combat": 15 } }
+          },
+          "tags": ["purchase"]
+        },
+        {
+          "id": "ch_haggle",
+          "text": "Regatear el precio",
+          "icon": "🤝",
+          "checkStat": "diplomacy",
+          "checkThreshold": 60,
+          "successChance": 0.5,
+          "successOutcome": {
+            "description": "Tu labia convence al herrero. Conseguís la espada por la mitad.",
+            "resourceChanges": { "gold": -75 },
+            "statChanges": { "targetEntity": "active", "changes": { "combat": 15 } }
+          },
+          "failureOutcome": {
+            "description": "El herrero se ofende y se va. Oportunidad perdida.",
+            "resourceChanges": {}
+          },
+          "tags": ["diplomacy"]
+        },
+        {
+          "id": "ch_pass",
+          "text": "Seguir camino",
+          "icon": "🚶",
+          "successOutcome": {
+            "description": "Dejás pasar la oportunidad y seguís tu camino.",
+            "resourceChanges": {}
+          },
+          "tags": ["safe"]
+        }
+      ]
+    }
+  ],
+
+  "eventPools": [
+    {
+      "id": "pool_act1_random",
+      "name": "Eventos aleatorios del Acto 1",
+      "events": [
+        { "eventId": "evt_blacksmith", "weight": 3, "conditions": [] },
+        { "eventId": "evt_red_wedding_rumor", "weight": 1, "conditions": [{ "type": "stat_gte", "target": "influence", "value": 30 }] }
+      ]
+    }
+  ],
+
+  "items": [
+    {
+      "id": "item_milk_of_poppy",
+      "name": "Leche de la Amapola",
+      "description": "Un poderoso calmante que restaura salud.",
+      "icon": "🧪",
+      "rarity": "uncommon",
+      "type": "consumable",
+      "effect": { "type": "heal", "value": 40 },
+      "maxStack": 5,
+      "price": 25,
+      "tags": ["healing", "maester"]
+    },
+    {
+      "id": "item_wildfire",
+      "name": "Fuego Valyrio",
+      "description": "Sustancia alquímica extremadamente volátil. Úsala con cuidado.",
+      "icon": "🟢",
+      "rarity": "epic",
+      "type": "consumable",
+      "effect": { "type": "buff", "target": "power", "value": 30, "duration": 3 },
+      "maxStack": 2,
+      "price": 200,
+      "tags": ["alchemy", "fire", "dangerous"]
+    }
+  ],
+
+  "combatConfig": {
+    "maxPartySize": 4,
+    "maxActivePerSide": 1,
+    "baseCritChance": 0.1,
+    "critMultiplier": 1.5,
+    "fleeBaseChance": 0.4,
+    "recruitEnabled": true,
+    "damageFormula": "standard",
+    "speedDeterminesTurnOrder": true,
+    "turnOrderStat": "speed",
+    "typeChart": {
+      "types": [
+        { "id": "fire", "name": "Fuego", "icon": "🔥", "color": "#dc2626" },
+        { "id": "martial", "name": "Marcial", "icon": "⚔️", "color": "#78716c" },
+        { "id": "cunning", "name": "Astucia", "icon": "🧠", "color": "#7c3aed" },
+        { "id": "holy", "name": "Sagrado", "icon": "✨", "color": "#eab308" },
+        { "id": "shadow", "name": "Sombra", "icon": "🌑", "color": "#1e293b" },
+        { "id": "flying", "name": "Volador", "icon": "🦅", "color": "#0ea5e9" }
+      ],
+      "matchups": [
+        { "attackType": "fire", "defendType": "martial", "multiplier": 1.5 },
+        { "attackType": "fire", "defendType": "shadow", "multiplier": 1.5 },
+        { "attackType": "fire", "defendType": "flying", "multiplier": 0.75 },
+        { "attackType": "martial", "defendType": "cunning", "multiplier": 0.75 },
+        { "attackType": "cunning", "defendType": "martial", "multiplier": 1.5 },
+        { "attackType": "cunning", "defendType": "fire", "multiplier": 0.5 },
+        { "attackType": "holy", "defendType": "shadow", "multiplier": 2.0 },
+        { "attackType": "shadow", "defendType": "holy", "multiplier": 0.5 },
+        { "attackType": "shadow", "defendType": "cunning", "multiplier": 1.5 }
+      ],
+      "defaultMultiplier": 1
+    }
+  },
+
+  "mapGenConfig": {
+    "rowsPerAct": 8,
+    "nodesPerRow": { "min": 2, "max": 4 },
+    "totalActs": 3,
+    "nodeDistribution": [
+      { "type": "battle", "weight": 30, "minPerAct": 3 },
+      { "type": "event", "weight": 25, "minPerAct": 2 },
+      { "type": "elite", "weight": 10, "minPerAct": 1, "maxPerAct": 2 },
+      { "type": "shop", "weight": 10, "minPerAct": 1, "maxPerAct": 2 },
+      { "type": "rest", "weight": 10, "minPerAct": 1, "maxPerAct": 2 },
+      { "type": "mystery", "weight": 8, "minPerAct": 0, "maxPerAct": 2 },
+      { "type": "treasure", "weight": 5, "minPerAct": 0, "maxPerAct": 1 },
+      { "type": "recruitment", "weight": 7, "minPerAct": 1, "maxPerAct": 2 },
+      { "type": "boss", "weight": 0, "minPerAct": 1, "maxPerAct": 1 }
+    ],
+    "connectionRules": { "maxForward": 3, "allowCross": true },
+    "eliteMinRow": 3,
+    "restMinRow": 4,
+    "shopMinRow": 2,
+    "encounterPools": {
+      "act1": [
+        { "id": "enc_kingsroad_bandits", "weight": 3 },
+        { "id": "enc_mountain_clan", "weight": 2 }
+      ],
+      "act3": [
+        { "id": "enc_boss_cersei", "weight": 1 }
+      ]
+    }
+  },
+
+  "gachaPools": [
+    {
+      "id": "gacha_ravens_call",
+      "name": "Llamado del Cuervo",
+      "description": "Enviá cuervos a los rincones del reino para reclutar aliados.",
+      "cost": { "gold": 50 },
+      "rates": { "common": 0.50, "uncommon": 0.25, "rare": 0.15, "epic": 0.08, "legendary": 0.02 },
+      "pityThreshold": 30,
+      "pityGuaranteedRarity": "epic",
+      "entityPool": ["champ_01", "adv_01", "drag_01"],
+      "featured": ["champ_01"],
+      "featuredBoost": 2
+    }
+  ],
+
+  "shops": [
+    {
+      "id": "shop_maester",
+      "name": "Cadena del Maestre",
+      "icon": "⛓️",
+      "slots": 4,
+      "refreshCost": { "gold": 20 },
+      "itemPool": [
+        { "itemId": "item_milk_of_poppy", "weight": 5, "priceMultiplier": 1 },
+        { "itemId": "item_wildfire", "weight": 1, "priceMultiplier": 1.5 }
+      ],
+      "entityPool": []
+    }
+  ],
+
+  "starter": {
+    "chooseBetween": 3,
+    "starterPool": ["champ_01", "adv_01"],
+    "initialResources": { "gold": 100, "influence": 50, "morale": 100, "provisions": 80 },
+    "initialItems": [
+      { "itemId": "item_milk_of_poppy", "quantity": 2 }
+    ]
+  },
+
+  "unlocks": [
+    {
+      "id": "unlock_gold_bonus",
+      "name": "Tesoro de la Corona",
+      "description": "Empezás cada run con +50 de oro.",
+      "icon": "🪙",
+      "category": "passive",
+      "cost": 100,
+      "maxLevel": 3,
+      "effect": { "type": "resource_bonus", "value": 50, "target": "gold" },
+      "tier": 1
+    },
+    {
+      "id": "unlock_dragon_starter",
+      "name": "Huevo de Dragón",
+      "description": "Desbloqueá un dragón como opción de starter.",
+      "icon": "🥚",
+      "category": "starter_entity",
+      "cost": 500,
+      "maxLevel": 1,
+      "effect": { "type": "add_starter", "value": 1, "target": "drag_01" },
+      "tier": 3,
+      "conditions": [{ "type": "flag", "target": "victories", "value": 3 }]
+    }
+  ],
+
+  "achievements": [
+    {
+      "id": "ach_first_victory",
+      "name": "Conquistador",
+      "description": "Ganá tu primera run completa.",
+      "icon": "👑",
+      "condition": { "type": "flag", "target": "victories", "value": 1 },
+      "reward": { "metaCurrency": 200 }
+    },
+    {
+      "id": "ach_dragon_tamer",
+      "name": "Madre de Dragones",
+      "description": "Reclutá un dragón legendario.",
+      "icon": "🐉",
+      "condition": { "type": "has_entity", "target": "drag_01", "value": true },
+      "reward": { "metaCurrency": 100, "unlockId": "unlock_dragon_starter" },
+      "hidden": true
+    }
+  ],
+
+  "uiTheme": {
+    "primaryColor": "#7c3aed",
+    "secondaryColor": "#dc2626",
+    "accentColor": "#eab308",
+    "backgroundColor": "#0f0f23",
+    "surfaceColor": "#1a1a2e",
+    "fontFamily": "'Cinzel', serif",
+    "borderStyle": "fantasy",
+    "cardStyle": "ornate",
+    "labels": {
+      "entitySingular": "Vasallo",
+      "entityPlural": "Vasallos",
+      "partySingular": "Corte",
+      "partyPlural": "Cortes",
+      "recruitVerb": "Reclutar",
+      "battleVerb": "Combatir",
+      "currency": "Dragones de Oro",
+      "metaCurrency": "Fuego de Dragón"
+    },
+    "backgrounds": {
+      "map": "/themes/got/bg-map.webp",
+      "combat": "/themes/got/bg-combat.webp",
+      "menu": "/themes/got/bg-menu.webp",
+      "shop": "/themes/got/bg-shop.webp"
+    }
+  },
+
+  "balancing": {
+    "xpCurve": "exponential",
+    "xpBasePerLevel": 100,
+    "xpGrowthRate": 1.25,
+    "difficultyScaling": 1.2,
+    "healOnLevelUp": true,
+    "maxInventorySlots": 15
+  }
+}
