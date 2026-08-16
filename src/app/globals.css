@@ -1,45 +1,45 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #f0f4f0;
-  --color-bg-alt: #e8ede8;
-  --color-surface: #ffffff;
-  --color-surface-light: #f7faf7;
-  --color-surface-glow: #eaf2ea;
-  --color-border: #d0ddd0;
-  --color-border-light: #c0d0c0;
+  --color-bg: #0a0e14;
+  --color-bg-alt: #0f1520;
+  --color-surface: #111a24;
+  --color-surface-light: #162030;
+  --color-surface-glow: #0d1a26;
+  --color-border: #1a2a3a;
+  --color-border-light: #243444;
 
-  --color-text: #1a2e1a;
-  --color-text-secondary: #4a6a4a;
-  --color-text-dim: #8a9e8a;
+  --color-text: #e0e8f0;
+  --color-text-secondary: #7a8ea0;
+  --color-text-dim: #4a5a6a;
 
-  --color-primary: #1b8a3a;
-  --color-primary-dim: rgba(27, 138, 58, 0.1);
-  --color-primary-glow: rgba(27, 138, 58, 0.2);
+  --color-primary: #00e676;
+  --color-primary-dim: rgba(0, 230, 118, 0.08);
+  --color-primary-glow: rgba(0, 230, 118, 0.2);
 
-  --color-accent: #d4a017;
-  --color-accent-dim: rgba(212, 160, 23, 0.1);
-  --color-accent-glow: rgba(212, 160, 23, 0.25);
+  --color-accent: #c8e600;
+  --color-accent-dim: rgba(200, 230, 0, 0.08);
+  --color-accent-glow: rgba(200, 230, 0, 0.2);
 
-  --color-danger: #c0392b;
-  --color-danger-dim: rgba(192, 57, 43, 0.1);
+  --color-danger: #ff4444;
+  --color-danger-dim: rgba(255, 68, 68, 0.1);
 
-  --color-epic: #7e57c2;
-  --color-epic-dim: rgba(126, 87, 194, 0.1);
+  --color-epic: #a855f7;
+  --color-epic-dim: rgba(168, 85, 247, 0.1);
 
-  --color-legendary: #d4a017;
-  --color-legendary-dim: rgba(212, 160, 23, 0.1);
+  --color-legendary: #fbbf24;
+  --color-legendary-dim: rgba(251, 191, 36, 0.1);
 
-  --color-info: #2980b9;
-  --color-info-dim: rgba(41, 128, 185, 0.1);
+  --color-info: #38bdf8;
+  --color-info-dim: rgba(56, 189, 248, 0.1);
 
-  --color-common: #7f8c8d;
-  --color-uncommon: #27ae60;
-  --color-rare: #2980b9;
+  --color-common: #64748b;
+  --color-uncommon: #22c55e;
+  --color-rare: #3b82f6;
 
-  --color-field-light: #4caf50;
-  --color-field-dark: #388e3c;
-  --color-field-line: rgba(255, 255, 255, 0.6);
+  --color-field-light: #1a5e20;
+  --color-field-dark: #0d4a14;
+  --color-field-line: rgba(0, 230, 118, 0.25);
 }
 
 body {
@@ -56,15 +56,18 @@ body {
 
 /* Glow utilities */
 .glow-green {
-  box-shadow: 0 2px 12px var(--color-primary-glow), 0 0 30px rgba(27, 138, 58, 0.08);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.15), 0 0 40px rgba(0, 230, 118, 0.05);
 }
 .glow-yellow {
-  box-shadow: 0 2px 12px var(--color-accent-glow), 0 0 30px rgba(212, 160, 23, 0.08);
+  box-shadow: 0 0 20px var(--color-accent-glow), 0 0 40px rgba(200, 230, 0, 0.05);
+}
+.glow-neon {
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.3), 0 0 24px rgba(0, 230, 118, 0.1), inset 0 0 8px rgba(0, 230, 118, 0.05);
 }
 
 /* Card shadow */
 .card-shadow {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 230, 118, 0.1);
 }
 
 /* Node pulse animation */
@@ -84,25 +87,33 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Football field backgrounds — solid colors */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Football field backgrounds */
 .field-potrero {
-  background: #a89040;
+  background: #3a6020;
 }
 
 .field-barrial {
-  background: #4a8e2e;
+  background: #1a5e20;
 }
 
 .field-profesional {
-  background: #2d7b1f;
+  background: #145218;
 }
 
 .field-continental {
-  background: #1b5e20;
+  background: #0d4a14;
 }
 
 .field-mundial {
-  background: #0d4a14;
+  background: #083a0e;
 }
 
 /* Rarity border gradients */
@@ -111,5 +122,12 @@ body {
 .rarity-rare { border-color: var(--color-rare); }
 .rarity-epic { border-color: var(--color-epic); }
 .rarity-legendary {
-  border-image: linear-gradient(135deg, #d4a017, #e8b828, #d4a017) 1;
+  border-image: linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24) 1;
+}
+
+/* Circuit pattern */
+.circuit-line {
+  background: linear-gradient(90deg, transparent 0%, var(--color-primary) 50%, transparent 100%);
+  height: 1px;
+  opacity: 0.15;
 }
