@@ -16,6 +16,7 @@ import { CopaCompleteScreen } from "./CopaCompleteScreen";
 import { MetaShopScreen } from "./MetaShopScreen";
 import { PartyPanel } from "../hud/PartyPanel";
 import { InventoryPanel } from "../hud/InventoryPanel";
+import { PlayerDetailPanel } from "../hud/PlayerDetailPanel";
 import type { Outcome, Choice, EntityTemplate } from "@/core/types";
 
 const COPA_FIELDS: Record<string, string> = {
@@ -48,6 +49,7 @@ export function GameScreen() {
   const [selectedPartyIdx, setSelectedPartyIdx] = useState(0);
   const [showParty, setShowParty] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
+  const [showPlayerDetail, setShowPlayerDetail] = useState(false);
 
   const handleNodeClick = useCallback((nodeId: string) => {
     useGameStore.getState().moveToNode(nodeId);
@@ -206,7 +208,7 @@ export function GameScreen() {
               </button>
             )}
           </div>
-          <EntityCard entity={party[selectedPartyIdx]} compact />
+          <EntityCard entity={party[selectedPartyIdx]} compact onClick={() => setShowPlayerDetail(true)} />
         </div>
       )}
 
@@ -244,6 +246,13 @@ export function GameScreen() {
 
       {showInventory && (
         <InventoryPanel onClose={() => setShowInventory(false)} />
+      )}
+
+      {showPlayerDetail && party[selectedPartyIdx] && (
+        <PlayerDetailPanel
+          entity={party[selectedPartyIdx]}
+          onClose={() => setShowPlayerDetail(false)}
+        />
       )}
     </div>
   );

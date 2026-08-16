@@ -99,26 +99,45 @@ function getSkillsForProfile(profile: string, rarity: string, seed: number): str
   };
   const pool = profileSkills[profile] || profileSkills.mid;
   const count = rarity === "legendary" ? 3 : rarity === "epic" ? 2 : rarity === "rare" ? 2 : 1;
-  const selected: string[] = [];
-  const shuffled = [...pool].sort((a, b) => {
+  const sorted = [...pool].sort((a, b) => {
+    const pa = SKILL_POOL.find((s) => s.id === a)?.power ?? 0;
+    const pb = SKILL_POOL.find((s) => s.id === b)?.power ?? 0;
+    return pb - pa;
+  });
+  const tierStart = rarity === "legendary" || rarity === "epic" ? 0
+    : rarity === "rare" ? 1
+    : Math.max(0, sorted.length - count - 1);
+  const tierSlice = sorted.slice(tierStart);
+  const shuffled = [...tierSlice].sort((a, b) => {
     const ha = ((seed * 2654435761 + a.charCodeAt(3) * 1013904223) >>> 0);
     const hb = ((seed * 2654435761 + b.charCodeAt(3) * 1013904223) >>> 0);
     return ha - hb;
   });
+  const selected: string[] = [];
   for (let i = 0; i < Math.min(count, shuffled.length); i++) {
     selected.push(shuffled[i]);
   }
   return selected;
 }
 
-function buildSkill(skillId: string) {
+const RARITY_POWER_SCALE: Record<string, number> = {
+  common: 0.65,
+  uncommon: 0.80,
+  rare: 1.0,
+  epic: 1.15,
+  legendary: 1.30,
+};
+
+function buildSkill(skillId: string, rarity?: string) {
   const template = SKILL_POOL.find((s) => s.id === skillId);
   if (!template) return null;
+  const scale = RARITY_POWER_SCALE[rarity ?? "rare"] ?? 1.0;
+  const scaledPower = template.power > 0 ? Math.round(template.power * scale) : 0;
   return {
     id: template.id,
     name: template.name,
     description: template.desc,
-    power: template.power,
+    power: scaledPower,
     cost: template.cost,
     costResource: "energia",
     accuracy: template.acc,
@@ -873,7 +892,7 @@ function parseTeamCountry(desc: string): { team?: string; country?: string } {
 function buildEntity(p: PlayerDef | EnemyDef) {
   const stats = generateStats(p.statProfile, p.rarity, hashStr(p.id));
   const baseStats = { ...stats };
-  const skills = p.skillIds.map(buildSkill).filter(Boolean);
+  const skills = p.skillIds.map((id) => buildSkill(id, p.rarity)).filter(Boolean);
   const entity: Record<string, unknown> = {
     id: p.id,
     name: p.name,
@@ -1094,6 +1113,174 @@ const EVENTS = [
     ch("ch_ir_cena", "Ir a la cena", "🍽️", { successOutcome: { description: "Sacás info del rival. Ventaja táctica.", resourceChanges: { moral: 5, fama: 5 }, xpGain: 15 }, tags: ["scouting"] }),
     ch("ch_no_ir_cena", "No ir", "🚫", { successOutcome: { description: "No fraternizar con el enemigo.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
   ]),
+
+  // ─── NEW EVENTS: Pool Potrero (+10) ─────────────────────────────────
+  evt("evt_gol_olimpico", "Gol Olímpico", "Tirás un córner y la pelota se mete directo.", "random", ["barrio", "lujo"], [
+    ch("ch_festejar", "Festejar como loco", "🎉", { successOutcome: { description: "¡Golazo olímpico! Leyenda del potrero.", resourceChanges: { fama: 15, moral: 15 }, xpGain: 25 }, tags: ["festejo"] }),
+    ch("ch_hacerse_el_humilde", "Hacerte el humilde", "😌", { successOutcome: { description: "Lo hiciste parecer fácil.", resourceChanges: { moral: 10 }, xpGain: 15 }, tags: ["safe"] }),
+  ]),
+  evt("evt_cancha_prestada", "Cancha Prestada", "Les prestan una cancha de sintético.", "random", ["barrio"], [
+    ch("ch_jugar_sint", "Jugar en el sintético", "🏟️", { successOutcome: { description: "Pique rápido. Te sentís crack.", resourceChanges: { moral: 10, energia: -5 }, xpGain: 20 }, tags: ["cancha"] }),
+    ch("ch_prefiero_tierra", "Preferir la tierra", "🌍", { successOutcome: { description: "El potrero es el potrero.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_mate_cancha", "Mate en la Cancha", "Alguien lleva un termo y mate al partido.", "random", ["social", "barrio"], [
+    ch("ch_tomar_mate", "Tomar mate", "🧉", { successOutcome: { description: "Mate amargo y fútbol. La vida.", resourceChanges: { energia: 10, moral: 10 } }, tags: ["social"] }),
+    ch("ch_calentar", "Ir a calentar", "🏃", { successOutcome: { description: "Entrás en calor más rápido.", resourceChanges: { energia: -5 }, xpGain: 10 }, tags: ["disciplina"] }),
+  ]),
+  evt("evt_pibe_crack", "El Pibe Crack", "Un nene de 10 años te hace un caño.", "random", ["humor", "barrio"], [
+    ch("ch_aplaudir_pibe", "Aplaudirlo", "👏", { successOutcome: { description: "Le reconocés el talento. El pibe te idolatra.", resourceChanges: { moral: 10 } }, tags: ["social"] }),
+    ch("ch_revancha", "Pedir revancha", "🔥", { checkStat: "regate", checkThreshold: 60, successChance: 0.5, successOutcome: { description: "Le devolvés el caño. Empate técnico.", resourceChanges: { moral: 10 }, xpGain: 15 }, failureOutcome: { description: "Te hace otro caño. Los pibes se ríen.", resourceChanges: { moral: -10 } }, tags: ["regate"] }),
+  ]),
+  evt("evt_apagon", "Apagón en la Cancha", "Se cortó la luz y no se ve nada.", "random", ["ambiente", "barrio"], [
+    ch("ch_luces_autos", "Pedir luces de autos", "🚗", { successChance: 0.6, successOutcome: { description: "Estacionan los autos y alumbran. Se juega.", resourceChanges: { moral: 5 }, xpGain: 10 }, failureOutcome: { description: "Nadie tiene auto. Se suspende.", resourceChanges: { moral: -10 } }, tags: ["ingenio"] }),
+    ch("ch_irse", "Irse a casa", "🏠", { successOutcome: { description: "Mañana será otro día.", resourceChanges: {} }, tags: ["safe"] }),
+  ]),
+  evt("evt_torneo_relampago", "Torneo Relámpago", "Organizan un torneo de 4 equipos en la plaza.", "random", ["barrio", "competencia"], [
+    ch("ch_inscribirse", "Inscribirse", "📝", { costs: { monedas: 50 }, checkStat: "fisico", checkThreshold: 50, successChance: 0.6, successOutcome: { description: "¡Campeones! Premio doble.", resourceChanges: { monedas: 150, moral: 15 }, xpGain: 35 }, failureOutcome: { description: "Perdiste en semifinal.", resourceChanges: { moral: -5 } }, tags: ["competencia"] }),
+    ch("ch_mirar", "Quedarte a mirar", "👀", { successOutcome: { description: "Viste jugadas que podés copiar.", xpGain: 10 }, tags: ["safe"] }),
+  ]),
+  evt("evt_lluvia_repentina", "Lluvia Repentina", "Arranca a llover en medio del partido.", "random", ["ambiente", "barrio"], [
+    ch("ch_seguir_lluvia", "Seguir jugando", "🌧️", { checkStat: "fisico", checkThreshold: 45, successChance: 0.7, successOutcome: { description: "El barro no te para.", resourceChanges: { moral: 10 }, xpGain: 20 }, failureOutcome: { description: "Resbalás y te embarrás entero.", resourceChanges: { energia: -15 } }, tags: ["fisico"] }),
+    ch("ch_refugio", "Ir al refugio", "🏠", { successOutcome: { description: "Esperás que pare. Perdés tiempo.", resourceChanges: { energia: -5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_goleada", "Goleada en el Potrero", "Tu equipo va ganando 5-0.", "random", ["barrio", "humor"], [
+    ch("ch_showtime", "Hacer lujos", "✨", { checkStat: "regate", checkThreshold: 55, successChance: 0.7, successOutcome: { description: "Rabona, caño, sombrero. Sos un artista.", resourceChanges: { fama: 10, moral: 10 }, xpGain: 20 }, failureOutcome: { description: "Te la sacaron y te putearon.", resourceChanges: { moral: -10 } }, tags: ["lujo"] }),
+    ch("ch_respetar", "Jugar con respeto", "🤝", { successOutcome: { description: "Fair play. Bien visto.", resourceChanges: { moral: 10 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_vieja_tribuna", "Tu Vieja en la Tribuna", "Tu mamá vino a verte jugar.", "random", ["familia", "barrio"], [
+    ch("ch_dedicar_gol", "Dedicarle un gol", "❤️", { checkStat: "tiro", checkThreshold: 50, successChance: 0.6, successOutcome: { description: "Gol y abrazo. Se le caen las lágrimas.", resourceChanges: { moral: 25, fama: 5 }, xpGain: 20 }, failureOutcome: { description: "No metiste gol pero ella te banca igual.", resourceChanges: { moral: 5 } }, tags: ["familia"] }),
+    ch("ch_jugar_tranqui", "Jugar tranquilo", "😊", { successOutcome: { description: "Buen partido. Después la invitás a comer.", resourceChanges: { moral: 10 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_pelota_pinchada", "Pelota Pinchada", "La única pelota se pinchó.", "random", ["barrio", "problema"], [
+    ch("ch_comprar_pelota", "Comprar una nueva", "💸", { costs: { monedas: 40 }, successOutcome: { description: "Pelota nueva. Se sigue.", resourceChanges: { moral: 5 } }, tags: ["compra"] }),
+    ch("ch_parchar", "Intentar parcharla", "🔧", { successChance: 0.5, successOutcome: { description: "Aguanta un rato más.", resourceChanges: {} }, failureOutcome: { description: "No hay arreglo. Se suspende.", resourceChanges: { moral: -10 } }, tags: ["ingenio"] }),
+  ]),
+
+  // ─── NEW EVENTS: Pool Profesional (+10) ─────────────────────────────
+  evt("evt_pretemporada", "Pretemporada Intensiva", "El cuerpo técnico preparó una pretemporada durísima.", "random", ["mejora", "profesional"], [
+    ch("ch_dar_todo", "Dar todo", "💪", { successOutcome: { description: "Terminas destruido pero más fuerte.", resourceChanges: { energia: -30 }, xpGain: 50 }, tags: ["disciplina"] }),
+    ch("ch_dosificar", "Dosificar el esfuerzo", "🐢", { successOutcome: { description: "Guardás energía pero no impresionás.", resourceChanges: { energia: -10 }, xpGain: 20 }, tags: ["safe"] }),
+  ]),
+  evt("evt_redes_sociales", "Escándalo en Redes", "Se viraliza un video tuyo en la cancha.", "random", ["fama", "profesional"], [
+    ch("ch_aprovechar", "Aprovecharlo", "📱", { successChance: 0.6, successOutcome: { description: "Tu marca personal creció. Más seguidores.", resourceChanges: { fama: 25, monedas: 100 } }, failureOutcome: { description: "Se burlaron y se hizo meme.", resourceChanges: { moral: -15, fama: -10 } }, tags: ["riesgo"] }),
+    ch("ch_borrar_redes", "Desactivar redes", "🚫", { successOutcome: { description: "Paz mental. Sin redes unos días.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_cancha_nueva", "Cancha Nueva", "El club inauguró estadio nuevo.", "random", ["equipo", "profesional"], [
+    ch("ch_primer_gol", "Buscar el primer gol del estadio", "⚽", { checkStat: "tiro", checkThreshold: 60, successChance: 0.5, successOutcome: { description: "¡Primer gol en el estadio nuevo! Sos historia.", resourceChanges: { fama: 30, moral: 20 }, xpGain: 30 }, failureOutcome: { description: "Otro lo metió primero.", resourceChanges: { moral: -5 } }, tags: ["tiro"] }),
+    ch("ch_disfrutar_cancha", "Disfrutar el momento", "🏟️", { successOutcome: { description: "Inauguración hermosa. Buena energía.", resourceChanges: { moral: 15 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_nutricionista", "Consulta con Nutricionista", "El club contrata un nutricionista.", "random", ["salud", "profesional"], [
+    ch("ch_dieta_estricta", "Seguir la dieta al pie", "🥗", { successOutcome: { description: "Te sentís liviano y rápido.", resourceChanges: { energia: 20, moral: -5 } }, tags: ["disciplina"] }),
+    ch("ch_milanesa", "Seguir comiendo milanesas", "🍖", { successOutcome: { description: "La milanesa es sagrada.", resourceChanges: { moral: 10 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_simulacion", "Simulación Táctica", "El DT pone videos del rival para analizar.", "random", ["táctica", "profesional"], [
+    ch("ch_estudiar", "Estudiar al rival", "📊", { successOutcome: { description: "Conocés todas sus debilidades.", resourceChanges: { energia: -10, moral: 10 }, xpGain: 30 }, tags: ["táctica"] }),
+    ch("ch_instinto", "Confiar en tu instinto", "⚡", { successOutcome: { description: "Improvisación pura. A veces funciona.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_capitan", "Te Eligen Capitán", "Los compañeros te votan como capitán.", "random", ["liderazgo", "profesional"], [
+    ch("ch_aceptar_cinta", "Aceptar la cinta", "©️", { successOutcome: { description: "Orgullo enorme. Más responsabilidad.", resourceChanges: { moral: 20, fama: 10 }, xpGain: 20 }, tags: ["liderazgo"] }),
+    ch("ch_declinar_cinta", "Declinar", "🤲", { successOutcome: { description: "Le dejás la cinta a otro. Humildad.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_masajista", "Sesión con el Masajista", "El masajista del club te atiende.", "random", ["salud", "profesional"], [
+    ch("ch_masaje_profundo", "Masaje profundo", "💆", { successOutcome: { description: "Dolió pero te sentís nuevo.", resourceChanges: { energia: 25 }, healParty: 30 }, tags: ["recuperación"] }),
+    ch("ch_masaje_suave", "Masaje suave", "🧘", { successOutcome: { description: "Relax total.", resourceChanges: { energia: 10, moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_camara_vestuario", "Cámara en el Vestuario", "Un camarógrafo quiere filmar la previa.", "random", ["fama", "profesional"], [
+    ch("ch_permitir_cam", "Permitir la cámara", "🎥", { successChance: 0.6, successOutcome: { description: "El video se hace viral. Buena imagen.", resourceChanges: { fama: 20 } }, failureOutcome: { description: "Grabaron una pelea. Mala prensa.", resourceChanges: { fama: -15, moral: -10 } }, tags: ["riesgo"] }),
+    ch("ch_prohibir_cam", "Prohibir la cámara", "🚫", { successOutcome: { description: "Lo que pasa en el vestuario, queda en el vestuario.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_debut_seleccion", "Debut en la Selección", "Te convocan para la selección nacional.", "random", ["oportunidad", "profesional"], [
+    ch("ch_ir_seleccion", "Ir a la selección", "🇦🇷", { successOutcome: { description: "Debut soñado. Cantás el himno.", resourceChanges: { fama: 30, moral: 20, energia: -15 }, xpGain: 40 }, tags: ["selección"] }),
+    ch("ch_foco_club", "Enfocarte en el club", "🏠", { successOutcome: { description: "Preferís crecer en el club.", resourceChanges: { moral: -5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_regalo_hincha", "Regalo de un Hincha", "Un hincha te trae un regalo en el entrenamiento.", "random", ["social", "profesional"], [
+    ch("ch_aceptar_regalo", "Aceptar el regalo", "🎁", { successOutcome: { description: "Una carta y una foto. Te emocionás.", resourceChanges: { moral: 15 } }, tags: ["social"] }),
+    ch("ch_sacarse_foto", "Sacarte una foto con el hincha", "📸", { successOutcome: { description: "Le hacés el día. La sube a redes.", resourceChanges: { fama: 10, moral: 10 } }, tags: ["social"] }),
+  ]),
+
+  // ─── NEW EVENTS: Pool Elite (+10) ───────────────────────────────────
+  evt("evt_mansion", "Mudanza a la Mansión", "Te comprás tu primera mansión.", "random", ["economía", "élite"], [
+    ch("ch_mansion_grande", "La mansión más grande", "🏰", { costs: { monedas: 800 }, successOutcome: { description: "Vivís como rey. Pileta, cancha y todo.", resourceChanges: { moral: 25, fama: 15 } }, tags: ["lujo"] }),
+    ch("ch_depto_lindo", "Un depto lindo y punto", "🏢", { costs: { monedas: 200 }, successOutcome: { description: "Cómodo y sin ostentación.", resourceChanges: { moral: 10 } }, tags: ["ahorro"] }),
+  ]),
+  evt("evt_champions_anthem", "Himno de Champions", "Suena la música de Champions League.", "random", ["motivación", "élite"], [
+    ch("ch_emocionarse", "Dejarte llevar por la emoción", "🎵", { successOutcome: { description: "Se te pone la piel de gallina. Jugás al 110%.", resourceChanges: { moral: 25 }, xpGain: 15 }, tags: ["emocional"] }),
+    ch("ch_foco_champions", "Mantener el foco", "🎯", { successOutcome: { description: "Frío como el hielo. Concentración total.", resourceChanges: { energia: 10 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_marca_ropa", "Contrato con Marca de Ropa", "Una marca top te quiere como modelo.", "random", ["economía", "élite"], [
+    ch("ch_modelar", "Aceptar y modelar", "👔", { successOutcome: { description: "Plata y fama. Sos imagen internacional.", resourceChanges: { monedas: 400, fama: 20, energia: -15 } }, tags: ["negocio"] }),
+    ch("ch_rechazar_marca", "Rechazar", "✋", { successOutcome: { description: "Te enfocás en el fútbol.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_critica_prensa", "Crítica Feroz de la Prensa", "Un periodista te destruye en TV.", "random", ["crisis", "élite"], [
+    ch("ch_responder_prensa", "Responder en conferencia", "🎤", { checkStat: "pase", checkThreshold: 70, successChance: 0.5, successOutcome: { description: "Lo callaste con argumentos. Ovación.", resourceChanges: { fama: 15, moral: 15 } }, failureOutcome: { description: "Quedaste peor. Se ríen de vos.", resourceChanges: { moral: -20, fama: -10 } }, tags: ["riesgo"] }),
+    ch("ch_ignorar_prensa", "Ignorar y jugar", "😤", { successOutcome: { description: "La cancha habla. Punto.", resourceChanges: { moral: -5 }, xpGain: 15 }, tags: ["safe"] }),
+  ]),
+  evt("evt_gol_100", "Gol Número 100", "Estás a un gol de los 100 en tu carrera.", "random", ["hito", "élite"], [
+    ch("ch_buscar_gol100", "Buscar el gol a toda costa", "🔥", { checkStat: "tiro", checkThreshold: 65, successChance: 0.6, successOutcome: { description: "¡GOL 100! Festejo histórico.", resourceChanges: { fama: 40, moral: 25 }, xpGain: 40 }, failureOutcome: { description: "No pudiste. Será la próxima.", resourceChanges: { moral: -10 } }, tags: ["tiro"] }),
+    ch("ch_jugar_equipo100", "Jugar para el equipo", "⚽", { successOutcome: { description: "El equipo gana. El gol llegará solo.", resourceChanges: { moral: 10 }, xpGain: 15 }, tags: ["safe"] }),
+  ]),
+  evt("evt_sancion_fifa", "Sanción de FIFA", "FIFA te investiga por una falta violenta.", "random", ["crisis", "élite"], [
+    ch("ch_apelar", "Apelar la sanción", "📜", { costs: { monedas: 300 }, successChance: 0.5, successOutcome: { description: "Apelación exitosa. Sin sanción.", resourceChanges: { moral: 15 } }, failureOutcome: { description: "Rechazada. Perdiste plata y tiempo.", resourceChanges: { moral: -15 } }, tags: ["riesgo"] }),
+    ch("ch_aceptar_sancion", "Aceptar y cumplir", "😔", { successOutcome: { description: "Cabeza gacha. Cumplís la sanción.", resourceChanges: { moral: -10, energia: -20 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_clasico", "El Clásico", "El partido más importante del año contra el rival eterno.", "random", ["presión", "élite"], [
+    ch("ch_arenga", "Dar la arenga del vestuario", "📢", { checkStat: "fisico", checkThreshold: 60, successChance: 0.6, successOutcome: { description: "El equipo sale como un volcán.", resourceChanges: { moral: 25 }, xpGain: 30 }, failureOutcome: { description: "Las palabras no alcanzan.", resourceChanges: { moral: -5 } }, tags: ["liderazgo"] }),
+    ch("ch_rutina_clasico", "Tu rutina de siempre", "🔄", { successOutcome: { description: "Hacés lo que sabés. Sin sorpresas.", resourceChanges: { moral: 5 }, xpGain: 15 }, tags: ["safe"] }),
+  ]),
+  evt("evt_hotel_5estrellas", "Hotel 5 Estrellas", "Concentración en un hotel de lujo.", "random", ["equipo", "élite"], [
+    ch("ch_spa", "Ir al spa", "🧖", { successOutcome: { description: "Relax total. Cuerpo y mente frescos.", resourceChanges: { energia: 20, moral: 10 }, healParty: 25 }, tags: ["recuperación"] }),
+    ch("ch_estudiar_rival", "Estudiar videos del rival", "📺", { successOutcome: { description: "Conocés cada movimiento del rival.", resourceChanges: { energia: -10 }, xpGain: 30 }, tags: ["táctica"] }),
+  ]),
+  evt("evt_lesion_compañero_estrella", "Lesión del Crack", "El crack del equipo se lesiona. Ahora dependés de vos.", "random", ["responsabilidad", "élite"], [
+    ch("ch_asumir_rol", "Asumir el rol de líder", "👑", { successOutcome: { description: "Te ponés el equipo al hombro.", resourceChanges: { moral: 10, fama: 15 }, xpGain: 35 }, tags: ["liderazgo"] }),
+    ch("ch_pedir_refuerzo_elite", "Pedir un refuerzo", "📋", { costs: { monedas: 200 }, successOutcome: { description: "Llega un jugador de experiencia.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_ovacion", "Ovación de Pie", "Todo el estadio te aplaude de pie.", "random", ["emocional", "élite"], [
+    ch("ch_agradecer", "Agradecer con aplausos", "👏", { successOutcome: { description: "Momento inolvidable. Se te caen las lágrimas.", resourceChanges: { moral: 30, fama: 20 } }, tags: ["emocional"] }),
+    ch("ch_seguir_corriendo", "Seguir corriendo", "🏃", { successOutcome: { description: "El partido no terminó. A seguir.", resourceChanges: { moral: 10 }, xpGain: 10 }, tags: ["safe"] }),
+  ]),
+
+  // ─── NEW EVENTS: Pool Mundial (+10) ─────────────────────────────────
+  evt("evt_fan_zone", "Fan Zone", "Te invitan a la fan zone del mundial.", "random", ["social", "mundial"], [
+    ch("ch_ir_fanzone", "Ir a la fan zone", "🎪", { successOutcome: { description: "Cánticos, banderas y emoción. La fiesta del fútbol.", resourceChanges: { moral: 20, energia: -10 } }, tags: ["social"] }),
+    ch("ch_descansar_fanzone", "Quedarte descansando", "🛏️", { successOutcome: { description: "Reservás energía para el partido.", resourceChanges: { energia: 15 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_cambio_horario", "Cambio de Horario", "El partido se juega a las 2 PM con 40 grados.", "random", ["ambiente", "mundial"], [
+    ch("ch_hidratarse", "Hidratarte al máximo", "💧", { successOutcome: { description: "Agua, sales, hielo. Aguantás el calor.", resourceChanges: { energia: -15, moral: 5 }, xpGain: 15 }, tags: ["disciplina"] }),
+    ch("ch_quejarse_calor", "Quejarte del horario", "😡", { successOutcome: { description: "No cambia nada pero te desahogás.", resourceChanges: { moral: -5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_intercambio_camisetas", "Intercambio de Camisetas", "Un crack mundial te pide la camiseta.", "random", ["social", "mundial"], [
+    ch("ch_intercambiar", "Intercambiar camisetas", "👕", { successOutcome: { description: "Tenés la camiseta de una leyenda. Tesoro.", resourceChanges: { moral: 20, fama: 10 } }, tags: ["social"] }),
+    ch("ch_guardar_camiseta", "Guardar tu camiseta", "🏠", { successOutcome: { description: "Tu camiseta es tu identidad.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_hotel_broma", "Broma en el Hotel", "Los compañeros te hacen una broma pesada.", "random", ["humor", "mundial"], [
+    ch("ch_reir_broma", "Reírte", "😂", { successOutcome: { description: "Buena onda. El grupo se relaja.", resourceChanges: { moral: 10 } }, tags: ["social"] }),
+    ch("ch_venganza", "Planear venganza", "😈", { successChance: 0.7, successOutcome: { description: "Tu contraataque fue épico. Leyenda del hotel.", resourceChanges: { moral: 15 } }, failureOutcome: { description: "Te atrapó el DT. Multa.", resourceChanges: { monedas: -50, moral: -10 } }, tags: ["humor"] }),
+  ]),
+  evt("evt_canto_micro", "Canto en el Micro", "En el micro camino al estadio, alguien empieza a cantar.", "random", ["motivación", "mundial"], [
+    ch("ch_cantar_micro", "Sumarte al canto", "🎤", { successOutcome: { description: "Todo el micro canta. Energía total.", resourceChanges: { moral: 20 } }, tags: ["pasión"] }),
+    ch("ch_auriculares", "Ponerte auriculares", "🎧", { successOutcome: { description: "Tu playlist te concentra.", resourceChanges: { energia: 5, moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_penal_decisivo", "Penal Decisivo", "Definición por penales. Sos el quinto.", "random", ["presión", "mundial"], [
+    ch("ch_patear_penal", "Patear al medio", "🎯", { checkStat: "tiro", checkThreshold: 65, successChance: 0.6, successOutcome: { description: "¡GOOOOL! Clasificación épica.", resourceChanges: { fama: 40, moral: 30 }, xpGain: 50 }, failureOutcome: { description: "Lo atajó. Silencio absoluto.", resourceChanges: { moral: -30, fama: -10 } }, tags: ["tiro"] }),
+    ch("ch_ceder_penal", "Ceder el penal a otro", "🤲", { successChance: 0.5, successOutcome: { description: "Tu compañero la clava. Aliviado.", resourceChanges: { moral: 10 } }, failureOutcome: { description: "La erró. Debiste patear vos.", resourceChanges: { moral: -20 } }, tags: ["riesgo"] }),
+  ]),
+  evt("evt_sueno_copa", "Sueño con la Copa", "Soñás que levantás la copa del mundo.", "random", ["emocional", "mundial"], [
+    ch("ch_buen_augurio", "Tomarlo como buen augurio", "🌟", { successOutcome: { description: "Te despertás con una energía inexplicable.", resourceChanges: { moral: 20, energia: 10 } }, tags: ["emocional"] }),
+    ch("ch_solo_sueno", "Es solo un sueño", "💭", { successOutcome: { description: "Volvés a la realidad. Hay que ganarlo en la cancha.", resourceChanges: { moral: 5 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_lesion_calentamiento", "Lesión en el Calentamiento", "Sentís un tirón en el calentamiento previo.", "random", ["crisis", "mundial"], [
+    ch("ch_jugar_igual_les", "Jugar igual", "💪", { successChance: 0.5, successOutcome: { description: "Aguantás y jugás un partidazo.", resourceChanges: { moral: 15 }, xpGain: 30 }, failureOutcome: { description: "Te sacaron a los 20 minutos.", resourceChanges: { moral: -25, energia: -20 } }, tags: ["riesgo"] }),
+    ch("ch_avisar_medico", "Avisar al médico", "🏥", { successOutcome: { description: "Te quedás en el banco pero cuidás el cuerpo.", resourceChanges: { moral: -10 }, healParty: 30 }, tags: ["safe"] }),
+  ]),
+  evt("evt_selfie_rival", "Selfie con el Rival", "Antes del partido un rival te pide una selfie.", "random", ["social", "mundial"], [
+    ch("ch_selfie_si", "Sacarte la selfie", "🤳", { successOutcome: { description: "Buena onda internacional.", resourceChanges: { fama: 5, moral: 5 } }, tags: ["social"] }),
+    ch("ch_selfie_no", "Rechazar", "😤", { successOutcome: { description: "Mentalidad de guerrero. No hay amigos acá.", resourceChanges: { moral: 10 } }, tags: ["safe"] }),
+  ]),
+  evt("evt_tercer_tiempo", "Tercer Tiempo", "Después del partido, los dos equipos se juntan.", "random", ["social", "mundial"], [
+    ch("ch_quedarse_3t", "Quedarte al tercer tiempo", "🍻", { successOutcome: { description: "Charla, risas y respeto entre rivales.", resourceChanges: { moral: 15, energia: -10, fama: 5 } }, tags: ["social"] }),
+    ch("ch_irse_3t", "Irte al hotel", "🚌", { successOutcome: { description: "Descanso directo. Mañana hay otro partido.", resourceChanges: { energia: 10 } }, tags: ["safe"] }),
+  ]),
 ];
 
 // ─── EVENT POOLS ────────────────────────────────────────────────────────
@@ -1112,6 +1299,16 @@ const EVENT_POOLS = [
       { eventId: "evt_perro", weight: 2, conditions: [] },
       { eventId: "evt_camiseta", weight: 2, conditions: [] },
       { eventId: "evt_asado", weight: 3, conditions: [] },
+      { eventId: "evt_gol_olimpico", weight: 2, conditions: [] },
+      { eventId: "evt_cancha_prestada", weight: 2, conditions: [] },
+      { eventId: "evt_mate_cancha", weight: 3, conditions: [] },
+      { eventId: "evt_pibe_crack", weight: 2, conditions: [] },
+      { eventId: "evt_apagon", weight: 2, conditions: [] },
+      { eventId: "evt_torneo_relampago", weight: 2, conditions: [] },
+      { eventId: "evt_lluvia_repentina", weight: 2, conditions: [] },
+      { eventId: "evt_goleada", weight: 2, conditions: [] },
+      { eventId: "evt_vieja_tribuna", weight: 2, conditions: [] },
+      { eventId: "evt_pelota_pinchada", weight: 2, conditions: [] },
     ],
   },
   {
@@ -1129,6 +1326,16 @@ const EVENT_POOLS = [
       { eventId: "evt_botines", weight: 2, conditions: [] },
       { eventId: "evt_juvenil_consejo", weight: 2, conditions: [] },
       { eventId: "evt_amistoso", weight: 2, conditions: [] },
+      { eventId: "evt_pretemporada", weight: 2, conditions: [] },
+      { eventId: "evt_redes_sociales", weight: 2, conditions: [] },
+      { eventId: "evt_cancha_nueva", weight: 2, conditions: [] },
+      { eventId: "evt_nutricionista", weight: 2, conditions: [] },
+      { eventId: "evt_simulacion", weight: 2, conditions: [] },
+      { eventId: "evt_capitan", weight: 2, conditions: [] },
+      { eventId: "evt_masajista", weight: 3, conditions: [] },
+      { eventId: "evt_camara_vestuario", weight: 2, conditions: [] },
+      { eventId: "evt_debut_seleccion", weight: 1, conditions: [] },
+      { eventId: "evt_regalo_hincha", weight: 2, conditions: [] },
     ],
   },
   {
@@ -1144,6 +1351,16 @@ const EVENT_POOLS = [
       { eventId: "evt_final_lluvia", weight: 2, conditions: [] },
       { eventId: "evt_agente", weight: 2, conditions: [] },
       { eventId: "evt_concentracion", weight: 2, conditions: [] },
+      { eventId: "evt_mansion", weight: 1, conditions: [] },
+      { eventId: "evt_champions_anthem", weight: 2, conditions: [] },
+      { eventId: "evt_marca_ropa", weight: 2, conditions: [] },
+      { eventId: "evt_critica_prensa", weight: 2, conditions: [] },
+      { eventId: "evt_gol_100", weight: 1, conditions: [] },
+      { eventId: "evt_sancion_fifa", weight: 1, conditions: [] },
+      { eventId: "evt_clasico", weight: 2, conditions: [] },
+      { eventId: "evt_hotel_5estrellas", weight: 2, conditions: [] },
+      { eventId: "evt_lesion_compañero_estrella", weight: 2, conditions: [] },
+      { eventId: "evt_ovacion", weight: 2, conditions: [] },
     ],
   },
   {
@@ -1159,6 +1376,16 @@ const EVENT_POOLS = [
       { eventId: "evt_formacion", weight: 2, conditions: [] },
       { eventId: "evt_ultimo_baile", weight: 1, conditions: [] },
       { eventId: "evt_cena_rivales", weight: 2, conditions: [] },
+      { eventId: "evt_fan_zone", weight: 2, conditions: [] },
+      { eventId: "evt_cambio_horario", weight: 2, conditions: [] },
+      { eventId: "evt_intercambio_camisetas", weight: 2, conditions: [] },
+      { eventId: "evt_hotel_broma", weight: 2, conditions: [] },
+      { eventId: "evt_canto_micro", weight: 3, conditions: [] },
+      { eventId: "evt_penal_decisivo", weight: 1, conditions: [] },
+      { eventId: "evt_sueno_copa", weight: 2, conditions: [] },
+      { eventId: "evt_lesion_calentamiento", weight: 1, conditions: [] },
+      { eventId: "evt_selfie_rival", weight: 2, conditions: [] },
+      { eventId: "evt_tercer_tiempo", weight: 2, conditions: [] },
     ],
   },
 ];
@@ -1166,14 +1393,14 @@ const EVENT_POOLS = [
 // ─── COPAS ──────────────────────────────────────────────────────────────
 
 const COPA_DEFS = [
-  { id: "copa_barrial", name: "Liga Barrial", emoji: "🏟️", region: "Argentina - Potrero", difficultyRange: [1, 2] as [number, number], rarityRates: { common: 0.55, uncommon: 0.30, rare: 0.10, epic: 0.04, legendary: 0.01 }, enemies: { normal: ["e_pibe_potrero", "e_juvenil_club"], elite: ["e_crack_barrio"], boss: ["e_referi_barrial"] }, eventPoolIds: ["pool_potrero"] },
-  { id: "copa_provincial", name: "Copa Provincial", emoji: "🏆", region: "Argentina - Regional", difficultyRange: [2, 3] as [number, number], rarityRates: { common: 0.45, uncommon: 0.33, rare: 0.15, epic: 0.05, legendary: 0.02 }, enemies: { normal: ["e_interior", "e_marcador_duro"], elite: ["e_goleador_prov"], boss: ["e_referente_local"] }, eventPoolIds: ["pool_potrero"] },
-  { id: "copa_primera", name: "Primera División", emoji: "⭐", region: "Argentina - Nacional", difficultyRange: [3, 5] as [number, number], rarityRates: { common: 0.30, uncommon: 0.35, rare: 0.22, epic: 0.10, legendary: 0.03 }, enemies: { normal: ["e_titular_primera", "e_suplente_ganas"], elite: ["e_refuerzo_mill"], boss: ["e_clasico_rival"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
-  { id: "copa_sudamericana", name: "Copa Sudamericana", emoji: "🌎", region: "CONMEBOL", difficultyRange: [4, 6] as [number, number], rarityRates: { common: 0.20, uncommon: 0.32, rare: 0.28, epic: 0.15, legendary: 0.05 }, enemies: { normal: ["e_volante_br", "e_defensa_col"], elite: ["e_crack_sudamer"], boss: ["e_boss_flamengo"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
-  { id: "copa_libertadores", name: "Copa Libertadores", emoji: "🔥", region: "CONMEBOL", difficultyRange: [5, 7] as [number, number], rarityRates: { common: 0.12, uncommon: 0.25, rare: 0.32, epic: 0.22, legendary: 0.09 }, enemies: { normal: ["e_extremo_br", "e_goleador_uru"], elite: ["e_estrella_cont"], boss: ["e_boss_campeon"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
-  { id: "copa_europa_league", name: "UEFA Europa League", emoji: "🌟", region: "Europa", difficultyRange: [6, 7] as [number, number], rarityRates: { common: 0.08, uncommon: 0.18, rare: 0.32, epic: 0.28, legendary: 0.14 }, enemies: { normal: ["e_mid_turco", "e_def_portug"], elite: ["e_crack_liga_media"], boss: ["e_boss_sevilla"] }, eventPoolIds: ["pool_profesional", "pool_elite"] },
-  { id: "copa_champions", name: "UEFA Champions League", emoji: "👑", region: "Europa", difficultyRange: [7, 9] as [number, number], rarityRates: { common: 0.05, uncommon: 0.12, rare: 0.25, epic: 0.35, legendary: 0.23 }, enemies: { normal: ["e_titular_city", "e_volante_bayern"], elite: ["e_estrella_eur"], boss: ["e_boss_real_madrid"] }, eventPoolIds: ["pool_profesional", "pool_elite"] },
-  { id: "copa_mundial_clubes", name: "Mundial de Clubes", emoji: "🌐", region: "FIFA - Global", difficultyRange: [8, 9] as [number, number], rarityRates: { common: 0.03, uncommon: 0.08, rare: 0.20, epic: 0.38, legendary: 0.31 }, enemies: { normal: ["e_allstar_inter"], elite: ["e_mvp_cont"], boss: ["e_boss_dream_team"] }, eventPoolIds: ["pool_elite", "pool_mundial"] },
+  { id: "copa_barrial", name: "Liga Barrial", emoji: "🏟️", region: "Argentina - Potrero", difficultyRange: [1, 2] as [number, number], rarityRates: { common: 0.65, uncommon: 0.25, rare: 0.08, epic: 0.02, legendary: 0 }, enemies: { normal: ["e_pibe_potrero", "e_juvenil_club"], elite: ["e_crack_barrio"], boss: ["e_referi_barrial"] }, eventPoolIds: ["pool_potrero"] },
+  { id: "copa_provincial", name: "Copa Provincial", emoji: "🏆", region: "Argentina - Regional", difficultyRange: [2, 3] as [number, number], rarityRates: { common: 0.55, uncommon: 0.30, rare: 0.12, epic: 0.03, legendary: 0 }, enemies: { normal: ["e_interior", "e_marcador_duro"], elite: ["e_goleador_prov"], boss: ["e_referente_local"] }, eventPoolIds: ["pool_potrero"] },
+  { id: "copa_primera", name: "Primera División", emoji: "⭐", region: "Argentina - Nacional", difficultyRange: [3, 5] as [number, number], rarityRates: { common: 0.40, uncommon: 0.35, rare: 0.18, epic: 0.06, legendary: 0.01 }, enemies: { normal: ["e_titular_primera", "e_suplente_ganas"], elite: ["e_refuerzo_mill"], boss: ["e_clasico_rival"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
+  { id: "copa_sudamericana", name: "Copa Sudamericana", emoji: "🌎", region: "CONMEBOL", difficultyRange: [4, 6] as [number, number], rarityRates: { common: 0.30, uncommon: 0.33, rare: 0.25, epic: 0.10, legendary: 0.02 }, enemies: { normal: ["e_volante_br", "e_defensa_col"], elite: ["e_crack_sudamer"], boss: ["e_boss_flamengo"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
+  { id: "copa_libertadores", name: "Copa Libertadores", emoji: "🔥", region: "CONMEBOL", difficultyRange: [5, 7] as [number, number], rarityRates: { common: 0.20, uncommon: 0.28, rare: 0.30, epic: 0.17, legendary: 0.05 }, enemies: { normal: ["e_extremo_br", "e_goleador_uru"], elite: ["e_estrella_cont"], boss: ["e_boss_campeon"] }, eventPoolIds: ["pool_potrero", "pool_profesional"] },
+  { id: "copa_europa_league", name: "UEFA Europa League", emoji: "🌟", region: "Europa", difficultyRange: [6, 7] as [number, number], rarityRates: { common: 0.12, uncommon: 0.22, rare: 0.32, epic: 0.25, legendary: 0.09 }, enemies: { normal: ["e_mid_turco", "e_def_portug"], elite: ["e_crack_liga_media"], boss: ["e_boss_sevilla"] }, eventPoolIds: ["pool_profesional", "pool_elite"] },
+  { id: "copa_champions", name: "UEFA Champions League", emoji: "👑", region: "Europa", difficultyRange: [7, 9] as [number, number], rarityRates: { common: 0.05, uncommon: 0.15, rare: 0.28, epic: 0.35, legendary: 0.17 }, enemies: { normal: ["e_titular_city", "e_volante_bayern"], elite: ["e_estrella_eur"], boss: ["e_boss_real_madrid"] }, eventPoolIds: ["pool_profesional", "pool_elite"] },
+  { id: "copa_mundial_clubes", name: "Mundial de Clubes", emoji: "🌐", region: "FIFA - Global", difficultyRange: [8, 9] as [number, number], rarityRates: { common: 0.03, uncommon: 0.10, rare: 0.22, epic: 0.38, legendary: 0.27 }, enemies: { normal: ["e_allstar_inter"], elite: ["e_mvp_cont"], boss: ["e_boss_dream_team"] }, eventPoolIds: ["pool_elite", "pool_mundial"] },
   { id: "copa_del_mundo", name: "Copa del Mundo", emoji: "🏅", region: "FIFA - Selecciones", difficultyRange: [9, 10] as [number, number], rarityRates: { common: 0.02, uncommon: 0.05, rare: 0.15, epic: 0.38, legendary: 0.40 }, enemies: { normal: ["e_seleccionado"], elite: ["e_estrella_sel"], boss: ["e_boss_final_mundial"] }, eventPoolIds: ["pool_elite", "pool_mundial"] },
 ];
 
@@ -1199,13 +1426,13 @@ function generateEncounters() {
   const copaEncounterDefs = [
     { copa: 1, normal: [{ id: "e_pibe_potrero", lvl: [1, 3] }, { id: "e_juvenil_club", lvl: [2, 4] }], elite: [{ id: "e_crack_barrio", lvl: [4, 6] }], boss: [{ id: "e_referi_barrial", lvl: [5, 7] }] },
     { copa: 2, normal: [{ id: "e_interior", lvl: [4, 6] }, { id: "e_marcador_duro", lvl: [4, 7] }], elite: [{ id: "e_goleador_prov", lvl: [6, 8] }], boss: [{ id: "e_referente_local", lvl: [7, 9] }] },
-    { copa: 3, normal: [{ id: "e_titular_primera", lvl: [7, 10] }, { id: "e_suplente_ganas", lvl: [6, 9] }], elite: [{ id: "e_refuerzo_mill", lvl: [9, 12] }], boss: [{ id: "e_clasico_rival", lvl: [11, 14] }] },
-    { copa: 4, normal: [{ id: "e_volante_br", lvl: [9, 12] }, { id: "e_defensa_col", lvl: [9, 12] }], elite: [{ id: "e_crack_sudamer", lvl: [11, 14] }], boss: [{ id: "e_boss_flamengo", lvl: [13, 16] }] },
-    { copa: 5, normal: [{ id: "e_extremo_br", lvl: [11, 14] }, { id: "e_goleador_uru", lvl: [11, 14] }], elite: [{ id: "e_estrella_cont", lvl: [13, 16] }], boss: [{ id: "e_boss_campeon", lvl: [15, 18] }] },
-    { copa: 6, normal: [{ id: "e_mid_turco", lvl: [13, 15] }, { id: "e_def_portug", lvl: [13, 15] }], elite: [{ id: "e_crack_liga_media", lvl: [14, 17] }], boss: [{ id: "e_boss_sevilla", lvl: [16, 19] }] },
-    { copa: 7, normal: [{ id: "e_titular_city", lvl: [15, 18] }, { id: "e_volante_bayern", lvl: [15, 18] }], elite: [{ id: "e_estrella_eur", lvl: [17, 20] }], boss: [{ id: "e_boss_real_madrid", lvl: [19, 22] }] },
-    { copa: 8, normal: [{ id: "e_allstar_inter", lvl: [17, 20] }], elite: [{ id: "e_mvp_cont", lvl: [19, 22] }], boss: [{ id: "e_boss_dream_team", lvl: [21, 24] }] },
-    { copa: 9, normal: [{ id: "e_seleccionado", lvl: [19, 22] }], elite: [{ id: "e_estrella_sel", lvl: [21, 24] }], boss: [{ id: "e_boss_final_mundial", lvl: [23, 26] }] },
+    { copa: 3, normal: [{ id: "e_titular_primera", lvl: [9, 12] }, { id: "e_suplente_ganas", lvl: [8, 11] }], elite: [{ id: "e_refuerzo_mill", lvl: [12, 15] }], boss: [{ id: "e_clasico_rival", lvl: [14, 17] }] },
+    { copa: 4, normal: [{ id: "e_volante_br", lvl: [12, 15] }, { id: "e_defensa_col", lvl: [12, 15] }], elite: [{ id: "e_crack_sudamer", lvl: [15, 18] }], boss: [{ id: "e_boss_flamengo", lvl: [17, 20] }] },
+    { copa: 5, normal: [{ id: "e_extremo_br", lvl: [14, 17] }, { id: "e_goleador_uru", lvl: [14, 17] }], elite: [{ id: "e_estrella_cont", lvl: [17, 20] }], boss: [{ id: "e_boss_campeon", lvl: [19, 22] }] },
+    { copa: 6, normal: [{ id: "e_mid_turco", lvl: [16, 19] }, { id: "e_def_portug", lvl: [16, 19] }], elite: [{ id: "e_crack_liga_media", lvl: [19, 22] }], boss: [{ id: "e_boss_sevilla", lvl: [21, 24] }] },
+    { copa: 7, normal: [{ id: "e_titular_city", lvl: [18, 21] }, { id: "e_volante_bayern", lvl: [18, 21] }], elite: [{ id: "e_estrella_eur", lvl: [21, 24] }], boss: [{ id: "e_boss_real_madrid", lvl: [23, 26] }] },
+    { copa: 8, normal: [{ id: "e_allstar_inter", lvl: [20, 23] }], elite: [{ id: "e_mvp_cont", lvl: [23, 26] }], boss: [{ id: "e_boss_dream_team", lvl: [25, 28] }] },
+    { copa: 9, normal: [{ id: "e_seleccionado", lvl: [22, 25] }], elite: [{ id: "e_estrella_sel", lvl: [25, 28] }], boss: [{ id: "e_boss_final_mundial", lvl: [27, 30] }] },
   ];
 
   for (const def of copaEncounterDefs) {
@@ -1378,6 +1605,16 @@ function buildTheme() {
           { attackType: "regate", defendType: "marca", multiplier: 0.5 },
           { attackType: "regate", defendType: "defensa", multiplier: 1.3 },
           { attackType: "capitán", defendType: "volante", multiplier: 1.2 },
+          { attackType: "tiro", defendType: "arco", multiplier: 0.7 },
+          { attackType: "tiro", defendType: "defensa", multiplier: 0.8 },
+          { attackType: "tiro", defendType: "marca", multiplier: 1.3 },
+          { attackType: "tiro", defendType: "volante", multiplier: 1.2 },
+          { attackType: "pase", defendType: "marca", multiplier: 0.7 },
+          { attackType: "pase", defendType: "volante", multiplier: 0.7 },
+          { attackType: "pase", defendType: "defensa", multiplier: 1.3 },
+          { attackType: "fisico", defendType: "velocidad", multiplier: 0.7 },
+          { attackType: "fisico", defendType: "regate", multiplier: 0.8 },
+          { attackType: "fisico", defendType: "defensa", multiplier: 1.3 },
         ],
         defaultMultiplier: 1,
       },

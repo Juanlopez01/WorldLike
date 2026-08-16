@@ -66,6 +66,27 @@ function getMapRows(mapInCopa: number, mapsPerCopa: number): { rows: number; nod
   return { rows: 5, nodesMin: 2, nodesMax: 3 };
 }
 
+function applyEquipmentBuffs(party: EntityInstance[], inventory: InventorySlot[], theme: ThemePack): EntityInstance[] {
+  const buffItems = inventory
+    .map((slot) => theme.items.find((i) => i.id === slot.itemId))
+    .filter((item): item is Item =>
+      !!item && (item.type === "equipment" || item.type === "passive") && item.effect.type === "buff" && !!item.effect.target
+    );
+
+  if (buffItems.length === 0) return party;
+
+  return party.map((entity) => {
+    const boostedStats = { ...entity.stats };
+    for (const item of buffItems) {
+      const stat = item.effect.target!;
+      if (stat in boostedStats) {
+        boostedStats[stat] = (boostedStats[stat] ?? 0) + item.effect.value;
+      }
+    }
+    return { ...entity, stats: boostedStats };
+  });
+}
+
 export const useGameStore = create<GameState>((set, get) => ({
   status: "idle",
   seed: 0,
@@ -309,7 +330,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    useCombatStore.getState().startCombat(party, encounter, theme, seed);
+    const buffedParty = applyEquipmentBuffs(party, get().inventory, theme);
+    useCombatStore.getState().startCombat(buffedParty, encounter, theme, seed);
     set({
       status: "combat",
       resources: {

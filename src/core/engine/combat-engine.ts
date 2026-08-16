@@ -74,7 +74,7 @@ export function getActiveEnemy(state: CombatState): Combatant | null {
   return state.enemyTeam.find((c) => c.isActive && isAlive(c)) ?? null;
 }
 
-function getTypeMultiplier(
+export function getTypeMultiplier(
   attackerTypes: string[],
   defenderTypes: string[],
   skillDamageType: string | undefined,

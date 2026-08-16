@@ -7,7 +7,7 @@ import { CombatantDisplay } from "./CombatantDisplay";
 import { SkillMenu } from "./SkillMenu";
 import { TurnLog } from "./TurnLog";
 import { VictoryScreen } from "./VictoryScreen";
-import type { CombatAction } from "@/core/types";
+import type { CombatAction, TypeChart } from "@/core/types";
 
 interface BattleScreenProps {
   onCombatEnd: (result: "victory" | "defeat" | "fled", rewards: { xp: number; resources: Record<string, number> } | null) => void;
@@ -15,6 +15,7 @@ interface BattleScreenProps {
 
 export function BattleScreen({ onCombatEnd }: BattleScreenProps) {
   const combat = useCombatStore((s) => s.combat);
+  const theme = useCombatStore((s) => s.theme);
   const lastResult = useCombatStore((s) => s.lastResult);
   const rewards = useCombatStore((s) => s.rewards);
 
@@ -235,6 +236,8 @@ export function BattleScreen({ onCombatEnd }: BattleScreenProps) {
           <SkillMenu
             skills={activePlayer.skills}
             attacker={activePlayer}
+            enemyTypes={activeEnemy?.types ?? []}
+            typeChart={theme?.combatConfig?.typeChart ?? theme?.typeChart}
             onSelectSkill={handleSkill}
             onFlee={handleFlee}
             onRecruit={handleRecruit}
