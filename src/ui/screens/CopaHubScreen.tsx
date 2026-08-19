@@ -77,7 +77,7 @@ export function CopaHubScreen() {
               className="px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/30 text-accent text-xs font-bold
                 hover:bg-accent/20 hover:border-accent/50 transition-all"
             >
-              TIENDA
+              ÁLBUM
             </button>
           </div>
         </motion.div>

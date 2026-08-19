@@ -2,25 +2,13 @@ import { create } from "zustand/react";
 
 const STORAGE_KEY = "futbolike_meta";
 
-export interface SpecialPlayer {
-  id: string;
-  name: string;
-  cost: number;
-  emoji: string;
-}
-
-export const SPECIAL_PLAYERS: SpecialPlayer[] = [
-  { id: "sp_maradona", name: "Diego Maradona", cost: 10000, emoji: "🇦🇷" },
-  { id: "sp_pele", name: "Pelé", cost: 7500, emoji: "🇧🇷" },
-  { id: "sp_zidane", name: "Zinedine Zidane", cost: 5000, emoji: "🇫🇷" },
-  { id: "sp_ronaldo_n", name: "Ronaldo Nazário", cost: 5000, emoji: "🇧🇷" },
-  { id: "sp_cruyff", name: "Johan Cruyff", cost: 3500, emoji: "🇳🇱" },
-  { id: "sp_ronaldinho", name: "Ronaldinho", cost: 3000, emoji: "🇧🇷" },
-  { id: "sp_di_stefano", name: "Alfredo Di Stéfano", cost: 2500, emoji: "🇦🇷" },
-  { id: "sp_van_basten", name: "Marco van Basten", cost: 1500, emoji: "🇳🇱" },
-  { id: "sp_beckenbauer", name: "Franz Beckenbauer", cost: 1000, emoji: "🇩🇪" },
-  { id: "sp_maldini", name: "Paolo Maldini", cost: 500, emoji: "🇮🇹" },
-];
+export const ALBUM_PRICES: Record<string, number> = {
+  common: 3500,
+  uncommon: 5000,
+  rare: 10000,
+  epic: 20000,
+  legendary: 35000,
+};
 
 export const COPA_REWARDS: Record<string, number> = {
   copa_barrial: 50,
@@ -37,7 +25,7 @@ export const COPA_REWARDS: Record<string, number> = {
 export interface MetaState {
   coins: number;
   completedCopas: string[];
-  purchasedPlayers: string[];
+  collection: string[];
   totalRuns: number;
   totalVictories: number;
 
@@ -45,8 +33,8 @@ export interface MetaState {
   spendCoins: (amount: number) => boolean;
   completeCopa: (copaId: string) => void;
   isCopaUnlocked: (copaId: string, allCopaIds: string[]) => boolean;
-  purchasePlayer: (playerId: string) => boolean;
-  hasPurchasedPlayer: (playerId: string) => boolean;
+  purchaseForAlbum: (playerId: string, rarity: string) => boolean;
+  hasInCollection: (playerId: string) => boolean;
   incrementRuns: () => void;
   saveMeta: () => void;
   loadMeta: () => void;
@@ -56,7 +44,7 @@ export interface MetaState {
 export const useMetaStore = create<MetaState>((set, get) => ({
   coins: 0,
   completedCopas: [],
-  purchasedPlayers: [],
+  collection: [],
   totalRuns: 0,
   totalVictories: 0,
 
@@ -87,17 +75,16 @@ export const useMetaStore = create<MetaState>((set, get) => ({
     return get().completedCopas.includes(allCopaIds[idx - 1]);
   },
 
-  purchasePlayer: (playerId) => {
-    const player = SPECIAL_PLAYERS.find((p) => p.id === playerId);
-    if (!player) return false;
-    if (get().hasPurchasedPlayer(playerId)) return false;
-    if (!get().spendCoins(player.cost)) return false;
-    set((s) => ({ purchasedPlayers: [...s.purchasedPlayers, playerId] }));
+  purchaseForAlbum: (playerId, rarity) => {
+    const cost = ALBUM_PRICES[rarity] ?? ALBUM_PRICES.common;
+    if (get().hasInCollection(playerId)) return false;
+    if (!get().spendCoins(cost)) return false;
+    set((s) => ({ collection: [...s.collection, playerId] }));
     get().saveMeta();
     return true;
   },
 
-  hasPurchasedPlayer: (playerId) => get().purchasedPlayers.includes(playerId),
+  hasInCollection: (playerId) => get().collection.includes(playerId),
 
   incrementRuns: () => {
     set((s) => ({ totalRuns: s.totalRuns + 1 }));
@@ -106,8 +93,8 @@ export const useMetaStore = create<MetaState>((set, get) => ({
 
   saveMeta: () => {
     try {
-      const { coins, completedCopas, purchasedPlayers, totalRuns, totalVictories } = get();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ coins, completedCopas, purchasedPlayers, totalRuns, totalVictories }));
+      const { coins, completedCopas, collection, totalRuns, totalVictories } = get();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ coins, completedCopas, collection, totalRuns, totalVictories }));
     } catch {}
   },
 
@@ -119,7 +106,7 @@ export const useMetaStore = create<MetaState>((set, get) => ({
       set({
         coins: data.coins ?? 0,
         completedCopas: data.completedCopas ?? [],
-        purchasedPlayers: data.purchasedPlayers ?? [],
+        collection: data.collection ?? data.purchasedPlayers ?? [],
         totalRuns: data.totalRuns ?? 0,
         totalVictories: data.totalVictories ?? 0,
       });
@@ -128,6 +115,6 @@ export const useMetaStore = create<MetaState>((set, get) => ({
 
   resetMeta: () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
-    set({ coins: 0, completedCopas: [], purchasedPlayers: [], totalRuns: 0, totalVictories: 0 });
+    set({ coins: 0, completedCopas: [], collection: [], totalRuns: 0, totalVictories: 0 });
   },
 }));
