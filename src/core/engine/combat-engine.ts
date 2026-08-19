@@ -28,6 +28,10 @@ export function createCombatState(
     isActive: i === 0,
   }));
 
+  const ENEMY_RARITY_MULT: Record<string, number> = {
+    common: 1.0, uncommon: 1.1, rare: 1.25, epic: 1.45, legendary: 1.7,
+  };
+
   const enemyTeam: Combatant[] = [];
   for (const enemyDef of encounter.enemies) {
     const template = theme.entities.find((e) => e.id === enemyDef.templateId);
@@ -39,8 +43,25 @@ export function createCombatState(
         { ...template, initialLevel: level },
         rng
       );
+
+      const rarityMult = ENEMY_RARITY_MULT[instance.rarity] ?? 1.0;
+      const isBoss = encounter.isBoss ?? (template.tags as string[] | undefined)?.includes("boss") ?? false;
+      const bossMult = isBoss ? 1.5 : 1.0;
+      const hpMult = rarityMult * bossMult;
+
+      const boostedHp = Math.floor(instance.maxHp * hpMult);
+      const boostedStats = { ...instance.stats };
+      if (rarityMult > 1.0) {
+        for (const key of Object.keys(boostedStats)) {
+          boostedStats[key] = Math.min(99, Math.floor(boostedStats[key] * rarityMult));
+        }
+      }
+
       enemyTeam.push({
         ...instance,
+        maxHp: boostedHp,
+        currentHp: boostedHp,
+        stats: boostedStats,
         side: "enemy" as const,
         position: enemyTeam.length,
         isActive: enemyTeam.length === 0,
@@ -408,10 +429,11 @@ export function executeEnemyTurn(
     targetId: player.instanceId,
   };
 
+  const enemyAccuracy = Math.min(100, skill.accuracy + 15);
   let hitMsg = "";
-  if (skill.accuracy < 100) {
+  if (enemyAccuracy < 100) {
     const roll = (rng?.next() ?? Math.random()) * 100;
-    if (roll > skill.accuracy) {
+    if (roll > enemyAccuracy) {
       const result = makeTurnResult(state.turn, action, `${enemy.name} usó ${skill.name} pero falló!`);
       let newState = { ...state, turnLog: [...state.turnLog, result] };
       newState = checkPostEnemyTurn(newState);
