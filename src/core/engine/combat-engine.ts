@@ -29,7 +29,7 @@ export function createCombatState(
   }));
 
   const ENEMY_RARITY_MULT: Record<string, number> = {
-    common: 1.0, uncommon: 1.1, rare: 1.25, epic: 1.45, legendary: 1.7,
+    common: 1.0, uncommon: 1.0, rare: 1.1, epic: 1.2, legendary: 1.4,
   };
 
   const enemyTeam: Combatant[] = [];
@@ -46,22 +46,15 @@ export function createCombatState(
 
       const rarityMult = ENEMY_RARITY_MULT[instance.rarity] ?? 1.0;
       const isBoss = encounter.isBoss ?? (template.tags as string[] | undefined)?.includes("boss") ?? false;
-      const bossMult = isBoss ? 1.5 : 1.0;
+      const bossMult = isBoss ? 1.2 : 1.0;
       const hpMult = rarityMult * bossMult;
 
       const boostedHp = Math.floor(instance.maxHp * hpMult);
-      const boostedStats = { ...instance.stats };
-      if (rarityMult > 1.0) {
-        for (const key of Object.keys(boostedStats)) {
-          boostedStats[key] = Math.min(99, Math.floor(boostedStats[key] * rarityMult));
-        }
-      }
 
       enemyTeam.push({
         ...instance,
         maxHp: boostedHp,
         currentHp: boostedHp,
-        stats: boostedStats,
         side: "enemy" as const,
         position: enemyTeam.length,
         isActive: enemyTeam.length === 0,
@@ -181,7 +174,7 @@ function calculateDamage(
     ...Object.values(defender.stats).filter((_, i) => i >= 4)
   ) || 50;
 
-  const baseDamage = ((atkStat * skill.power) / (defStat + 50)) * 2 + 5;
+  const baseDamage = ((atkStat * skill.power) / (defStat + 50)) * 2 + 10;
 
   const { multiplier, effectiveness } = getTypeMultiplier(
     attacker.types,
@@ -429,7 +422,7 @@ export function executeEnemyTurn(
     targetId: player.instanceId,
   };
 
-  const enemyAccuracy = Math.min(100, skill.accuracy + 15);
+  const enemyAccuracy = Math.min(100, skill.accuracy + 5);
   let hitMsg = "";
   if (enemyAccuracy < 100) {
     const roll = (rng?.next() ?? Math.random()) * 100;

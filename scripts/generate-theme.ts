@@ -97,8 +97,9 @@ function getSkillsForProfile(profile: string, rarity: string, seed: number): str
     wing: ["sk_gambeta_corta", "sk_enganchar", "sk_centro_venenoso", "sk_sombrero", "sk_rabona", "sk_regate_doble"],
     att: ["sk_definicion_letal", "sk_bombazo", "sk_chilena", "sk_cabezazo", "sk_volea", "sk_depredador", "sk_media_vuelta"],
   };
-  const pool = profileSkills[profile] || profileSkills.mid;
-  const count = rarity === "legendary" ? 3 : rarity === "epic" ? 2 : rarity === "rare" ? 2 : 1;
+  const rawPool = profileSkills[profile] || profileSkills.mid;
+  const pool = rawPool.filter((id) => (SKILL_POOL.find((s) => s.id === id)?.power ?? 0) > 0);
+  const count = rarity === "legendary" ? 3 : rarity === "epic" ? 3 : rarity === "rare" ? 2 : 2;
   const sorted = [...pool].sort((a, b) => {
     const pa = SKILL_POOL.find((s) => s.id === a)?.power ?? 0;
     const pb = SKILL_POOL.find((s) => s.id === b)?.power ?? 0;
@@ -121,11 +122,11 @@ function getSkillsForProfile(profile: string, rarity: string, seed: number): str
 }
 
 const RARITY_POWER_SCALE: Record<string, number> = {
-  common: 0.65,
-  uncommon: 0.80,
+  common: 0.85,
+  uncommon: 0.92,
   rare: 1.0,
-  epic: 1.15,
-  legendary: 1.30,
+  epic: 1.10,
+  legendary: 1.25,
 };
 
 function buildSkill(skillId: string, rarity?: string) {
