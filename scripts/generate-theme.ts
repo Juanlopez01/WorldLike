@@ -90,9 +90,9 @@ const SKILL_POOL = [
 
 function getSkillsForProfile(profile: string, rarity: string, seed: number): string[] {
   const profileSkills: Record<string, string[]> = {
-    gk: ["sk_achique", "sk_atajada", "sk_penales"],
-    def: ["sk_barrida", "sk_cabezazo", "sk_tackleo", "sk_marca_personal", "sk_liderazgo"],
-    dm: ["sk_pressing", "sk_quite", "sk_barrida", "sk_pared", "sk_marca_personal"],
+    gk: ["sk_achique", "sk_penales", "sk_cabezazo", "sk_pressing"],
+    def: ["sk_barrida", "sk_cabezazo", "sk_tackleo", "sk_pressing", "sk_bombazo", "sk_marca_personal"],
+    dm: ["sk_pressing", "sk_quite", "sk_barrida", "sk_pared", "sk_cabezazo", "sk_tackleo"],
     mid: ["sk_pase_filtrado", "sk_tiki_taka", "sk_diagonal", "sk_pared", "sk_media_vuelta", "sk_tiro_libre"],
     wing: ["sk_gambeta_corta", "sk_enganchar", "sk_centro_venenoso", "sk_sombrero", "sk_rabona", "sk_regate_doble"],
     att: ["sk_definicion_letal", "sk_bombazo", "sk_chilena", "sk_cabezazo", "sk_volea", "sk_depredador", "sk_media_vuelta"],
@@ -105,10 +105,7 @@ function getSkillsForProfile(profile: string, rarity: string, seed: number): str
     const pb = SKILL_POOL.find((s) => s.id === b)?.power ?? 0;
     return pb - pa;
   });
-  const tierStart = rarity === "legendary" || rarity === "epic" ? 0
-    : rarity === "rare" ? 1
-    : Math.max(0, sorted.length - count - 1);
-  const tierSlice = sorted.slice(tierStart);
+  const tierSlice = sorted;
   const shuffled = [...tierSlice].sort((a, b) => {
     const ha = ((seed * 2654435761 + a.charCodeAt(3) * 1013904223) >>> 0);
     const hb = ((seed * 2654435761 + b.charCodeAt(3) * 1013904223) >>> 0);
